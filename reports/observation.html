@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>早期物体观测修正 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="observation.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">历史探索</span> · 来源 <code>results/three_way_dynamic/REPORT.md</code><p>两条开发短段的低通与RGB观测修正，保留深度幅度和速度尾部偏差。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">执行与固定评价</a><a href="#section-2">box</a><a href="#section-3">banana</a><a href="#section-4">动作幅度与残留问题</a><a href="#section-5">观测检查范围</a><a href="#section-6">文件</a></details><h1 id="section-0">物体观测修正：两条正式结果</h1>
+<p>在这两条已接触开发样例上，RGB 观测修正进一步降低了 LP5 后的平均位置、速度和旋转动态误差，并改善了留出的 RGB 位移检查。深度方向的运动幅度仍偏大，速度 P95 也高于 LP5。下一步的主要问题是深度轨迹和较大朝向跳变。</p>
+<h2 id="section-1">执行与固定评价</h2>
+<ul>
+<li>box / banana 的正式 receipt 均为 <code>exit_code=0, steps=300</code>，耗时 42.34 / 40.25 s；只在终态确认后评分。</li>
+<li>Raw / LP5 / ObsRefine 使用相同完整 74 / 72 源帧、相同时间戳、未滤 GT 和各序列 Raw 冻结的 canonical 右 offset。固定资产为新根 <code>fixed_eval_contract/{tag}.json</code>。</li>
+<li>LP5 使用最终固定 10 次 SO(3) 均值迭代，整个正式优化期间初始化文件保持冻结。</li>
+<li>ObsRefine 除 <code>object_T</code>、<code>object_centroid_m</code> 外的全部原数组与 Raw 字节相同，手、K、mesh、尺度、帧和 valid 身份均保持一致。检查记录在 <code>runs/obs_refine/{tag}/evaluation_identity.json</code>。</li>
+<li>相对指标是共同 camera 轴中的 hand joint−各自 object surface centroid，GT 可直接比较。本文没有将其称为接触滑动。</li>
+</ul>
+<h2 id="section-2">box</h2>
+<div class="table-wrap"><table><thead><tr><th>mean 指标</th><th>Raw</th><th>LP5</th><th>ObsRefine</th></tr></thead><tbody>
+<tr><td>centroid position error (mm)</td><td>73.68</td><td>70.71</td><td>66.27</td></tr>
+<tr><td>centroid velocity error (mm/s)</td><td>582.09</td><td>275.61</td><td>241.78</td></tr>
+<tr><td>centroid RTE (mm)</td><td>19.40</td><td>9.19</td><td>8.06</td></tr>
+<tr><td>ARE (rad), shared Raw offset</td><td>0.7623</td><td>0.7505</td><td>0.7405</td></tr>
+<tr><td>RRE (rad), shared Raw offset</td><td>0.1612</td><td>0.0657</td><td>0.0554</td></tr>
+<tr><td>camera angular velocity vector error (rad/s)</td><td>4.978</td><td>2.239</td><td>1.910</td></tr>
+<tr><td>hand-object relative joint position error (mm)</td><td>77.54</td><td>75.56</td><td>70.77</td></tr>
+<tr><td>hand-object relative joint velocity error (mm/s)</td><td>548.33</td><td>324.80</td><td>321.03</td></tr>
+<tr><td>original-resolution mask IoU</td><td>0.63338</td><td>0.63605</td><td>0.64917</td></tr>
+<tr><td>holdout RGB displacement EPE, pair-equal (px)</td><td>6.763</td><td>3.154</td><td>2.507</td></tr>
+</tbody></table></div>
+<p>对 LP5，ObsRefine 的 centroid velocity error 下降 12.28%，留出 RGB EPE 下降 20.50%；相对 joint velocity error 仅下降 1.16%。</p>
+<h2 id="section-3">banana</h2>
+<div class="table-wrap"><table><thead><tr><th>mean 指标</th><th>Raw</th><th>LP5</th><th>ObsRefine</th></tr></thead><tbody>
+<tr><td>centroid position error (mm)</td><td>93.37</td><td>92.35</td><td>88.79</td></tr>
+<tr><td>centroid velocity error (mm/s)</td><td>572.33</td><td>196.67</td><td>132.89</td></tr>
+<tr><td>centroid RTE (mm)</td><td>19.08</td><td>6.56</td><td>4.43</td></tr>
+<tr><td>ARE (rad), shared Raw offset</td><td>0.9986</td><td>1.0018</td><td>0.9481</td></tr>
+<tr><td>RRE (rad), shared Raw offset</td><td>0.1555</td><td>0.1469</td><td>0.1086</td></tr>
+<tr><td>camera angular velocity vector error (rad/s)</td><td>4.373</td><td>4.113</td><td>2.958</td></tr>
+<tr><td>hand-object relative joint position error (mm)</td><td>90.40</td><td>89.51</td><td>85.98</td></tr>
+<tr><td>hand-object relative joint velocity error (mm/s)</td><td>539.58</td><td>241.69</td><td>202.39</td></tr>
+<tr><td>original-resolution mask IoU</td><td>0.60619</td><td>0.60773</td><td>0.66531</td></tr>
+<tr><td>holdout RGB displacement EPE, pair-equal (px)</td><td>6.321</td><td>2.661</td><td>1.931</td></tr>
+</tbody></table></div>
+<p>对 LP5，ObsRefine 的 centroid velocity error 下降 32.43%，angular velocity vector error 下降 28.08%，相对 joint velocity error 下降 16.26%，留出 RGB EPE 下降 27.46%。</p>
+<h2 id="section-4">动作幅度与残留问题</h2>
+<div class="table-wrap"><table><thead><tr><th>ObsRefine / GT 量</th><th>box</th><th>banana</th></tr></thead><tbody>
+<tr><td>camera x velocity absolute error (mm/s)</td><td>42.16</td><td>30.88</td></tr>
+<tr><td>camera y velocity absolute error (mm/s)</td><td>65.13</td><td>58.45</td></tr>
+<tr><td>camera z velocity absolute error (mm/s)</td><td>212.47</td><td>95.34</td></tr>
+<tr><td>object x P95−P5 range (mm), Obs / GT</td><td>34.30 / 15.81</td><td>61.15 / 31.97</td></tr>
+<tr><td>object y P95−P5 range (mm), Obs / GT</td><td>206.29 / 181.86</td><td>275.00 / 220.81</td></tr>
+<tr><td>object z P95−P5 range (mm), Obs / GT</td><td>237.05 / 72.06</td><td>128.25 / 32.07</td></tr>
+<tr><td>object mean speed / GT</td><td>2.67</td><td>1.84</td></tr>
+<tr><td>object speed P95 (mm/s), LP5 / Obs / GT</td><td>836.02 / 1019.79 / 463.33</td><td>937.10 / 947.86 / 663.99</td></tr>
+</tbody></table></div>
+<p>这些量说明平均误差下降后仍保留较大的深度额外运动。box 深度幅度约 GT 的 3.3 倍，banana 约 4.0 倍。速度 P95 高于 LP5，不能用平均速度误差下降代替整个速度分布的改善。</p>
+<p>三组运动曲线和独立观测曲线均已实际打开检查：</p>
+<ul>
+<li>box 的 ObsRefine 降低了一些深度和角速度尖峰，但保留约 1.4 s 的额外深度抬升，以及与 GT 不同的最终转角。相对速度曲线多数时段接近 LP5，符合仅 1.16% 的平均相对速度改善。</li>
+<li>banana 的 1.1 s 朝向跳变仍清楚可见，ObsRefine 降低了它的角速度峰值。depth range 和较慢的位置偏差仍在。</li>
+<li>观测图中，banana 的 mask IoU 改善覆盖多个时段；两段留出 RGB 位移误差曲线多数尖峰降低，部分 pair 仍变差。</li>
+</ul>
+<h2 id="section-5">观测检查范围</h2>
+<p>每个条件共用同一冻结 LP5 射线关联的 <code>q_local_m</code>，没有为 Raw 或 ObsRefine 重建表面对应。EPE 先在每个 source pair 内平均点误差，再跨 pair 等权平均。box 留出支持为 850 点 / 73 pairs；banana 为 321 点 / 69 pairs。三组支持一致。</p>
+<p>SAM3 object mask 已参与优化，其 IoU 是拟合检查。留出 RGB tracks 提供额外的观测检查；轨迹来自同一短视频。GT 仅用于固定评价，不进入低通或 ObsRefine。结果范围是这两条开发样例。</p>
+<h2 id="section-6">文件</h2>
+<ul>
+<li><code>all_metrics.csv</code>：三组完整表，包括 x/y/z 速度误差、各轴 P95−P5、速度 P95、角速度分量、相对指标与观测覆盖率。</li>
+<li><code>{tag}.json</code>、<code>{tag}.md</code>：每段完整精确数值表。</li>
+<li><code>{tag}/motion_comparison.png</code>、<code>.pdf</code>、<code>motion_curves.csv</code>：Raw / LP5 / ObsRefine / 原始 GT 的十二项同步曲线。</li>
+<li><code>observation_curves.png</code>、<code>.pdf</code>：原分辨率 mask IoU 与留出 RGB pair EPE 曲线。</li>
+<li>新根 <code>results/paired_dynamic/{tag}/full_source_common/</code>：同 Raw offset 的完整机器可读分数。</li>
+<li>新根 <code>results/observation_comparison/{tag}/</code>：CPU 原分辨率观测检查与逐帧 mask 分数。</li>
+</ul>
+<p>输入、终态 receipt、预测与评分资产都保留在项目目录和研究服务器同名目录；旧项目只读。没有因这些结果进行 GT 调参或额外模型训练。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

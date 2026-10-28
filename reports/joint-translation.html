@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>早期腕物联合平移 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="joint-translation.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">历史探索</span> · 来源 <code>results/joint_stage_comparison/REPORT.md</code><p>粗接触的物体/相对运动收益与手部误差代价。</p></div><details class="toc"><summary>本页目录</summary></details><h1 id="section-0">Box 腕物联合平移：独立评价</h1>
+<p>加入粗接触后，物体及手物相对动作更接近真值，手腕误差和手部留出像素运动误差增加。这个结果支持粗接触的几何收益；采用标准中的手部动作与图像保真仍需要改善。</p>
+<p>本轮是既有开发 box 的单初始化、固定旋转、仅平移消融。起点为 C 物体＋Raw 手，J0 进行双方图像与碰撞优化，JH 额外加入 HACO 粗接触。GT 仅在终态评分读取，三组沿用 Raw 首帧固定 canonical offset、原始未滤 GT 和相同观测集合。</p>
+<div class="table-wrap"><table><thead><tr><th>指标</th><th>C＋Raw 手</th><th>J0</th><th>JH</th></tr></thead><tbody>
+<tr><td>腕位置误差 (mm)</td><td>44.7439</td><td>43.98</td><td>53.016</td></tr>
+<tr><td>腕速度向量误差均值 (mm/s)</td><td>274.624</td><td>188.743</td><td>211.59</td></tr>
+<tr><td>腕速度向量误差 P95 (mm/s)</td><td>651.292</td><td>582.678</td><td>585.643</td></tr>
+<tr><td>腕 z 速度绝对误差 (mm/s)</td><td>253.838</td><td>165.468</td><td>188.007</td></tr>
+<tr><td>物体中心位置误差 (mm)</td><td>65.5584</td><td>64.3787</td><td>53.1429</td></tr>
+<tr><td>物体速度向量误差均值 (mm/s)</td><td>236.795</td><td>232.761</td><td>210.115</td></tr>
+<tr><td>物体速度向量误差 P95 (mm/s)</td><td>679.768</td><td>742.708</td><td>499.087</td></tr>
+<tr><td>物体 z 速度绝对误差 (mm/s)</td><td>207.665</td><td>205.166</td><td>183.827</td></tr>
+<tr><td>手物相对关节位置误差 (mm)</td><td>70.01</td><td>67.8962</td><td>48.0975</td></tr>
+<tr><td>手物相对关节速度误差 (mm/s)</td><td>321.642</td><td>237.557</td><td>207.973</td></tr>
+<tr><td>手固定忽略区 mask IoU</td><td>0.713644</td><td>0.732141</td><td>0.740261</td></tr>
+<tr><td>手留出 RGB 位移误差 (px)</td><td>2.35608</td><td>2.09108</td><td>2.17163</td></tr>
+<tr><td>物体 mask IoU</td><td>0.650998</td><td>0.653319</td><td>0.661536</td></tr>
+<tr><td>物体留出 RGB 位移误差 (px)</td><td>2.49836</td><td>2.53177</td><td>2.51863</td></tr>
+<tr><td>接触窗区域等权距离，完整74帧分母 (mm)</td><td>33.4932</td><td>32.807</td><td>20.9446</td></tr>
+</tbody></table></div>
+<p>JH 对 J0：物体速度均值下降 9.73%，速度误差 P95 下降 32.80%，相对关节位置误差下降 29.16%、相对速度下降 12.45%；腕位置误差增加 20.55%、腕速度误差增加 12.10%，手留出 EPE 增加 3.85%。三组旋转完全相同，ARE/RRE 与角速度误差保持一致。</p>
+<p>双方留出集保持相同支持：</p>
+<ul>
+<li>手：624 个点，70 个相邻帧 pair；先在 pair 内平均，再跨 pair 等权。</li>
+<li>物体：850 个点，73 个相邻帧 pair；先在 pair 内平均，再跨 pair 等权。</li>
+</ul>
+<p>独立几何评价使用原 mesh、冻结法向兼容面集合及全部 7737 个候选。最近距离由 float64 三角面投影和三条线段距离计算，保留原分母。6 个区域的均值与 P95 均下降，掌部和部分手指仍有厘米级间隔。</p>
+<div class="table-wrap"><table><thead><tr><th>区域</th><th>候选数</th><th>J0 mean / P95 (mm)</th><th>JH mean / P95 (mm)</th></tr></thead><tbody>
+<tr><td>palm</td><td>102</td><td>107.520 / 147.858</td><td>89.400 / 114.639</td></tr>
+<tr><td>index</td><td>2204</td><td>69.449 / 107.684</td><td>33.651 / 76.028</td></tr>
+<tr><td>middle</td><td>1311</td><td>62.085 / 100.935</td><td>30.760 / 79.950</td></tr>
+<tr><td>pinky</td><td>1056</td><td>68.944 / 117.138</td><td>50.415 / 113.003</td></tr>
+<tr><td>ring</td><td>1981</td><td>70.017 / 118.206</td><td>44.364 / 116.622</td></tr>
+<tr><td>thumb</td><td>1083</td><td>47.583 / 85.284</td><td>30.376 / 61.326</td></tr>
+</tbody></table></div>
+<p>双向穿透采用独立 CPU Open3D 真实三角网格：全 778 个原 MANO 顶点进入固定凸包，原物体表面另取 2048 个面积加权样本进入封闭 MANO（seed=20261021）。训练使用 256 个表面点。</p>
+<div class="table-wrap"><table><thead><tr><th>方向与统计</th><th>C＋Raw 手</th><th>J0</th><th>JH</th></tr></thead><tbody>
+<tr><td>手进物体凸包 全点均值 (mm)</td><td>0.00567531</td><td>0.0012298</td><td>0.00184925</td></tr>
+<tr><td>手进物体凸包 每帧最大值 P95 (mm)</td><td>5.38593</td><td>2.17304</td><td>2.18941</td></tr>
+<tr><td>手进物体凸包 全局最大 (mm)</td><td>6.10946</td><td>2.52262</td><td>2.51494</td></tr>
+<tr><td>手进物体凸包 出现 &gt;2mm 的帧数</td><td>7</td><td>6</td><td>10</td></tr>
+<tr><td>物体进封闭手 全点均值 (mm)</td><td>0.000312385</td><td>5.40635e-05</td><td>9.28018e-05</td></tr>
+<tr><td>物体进封闭手 每帧最大值 P95 (mm)</td><td>3.10748</td><td>1.0597</td><td>1.09214</td></tr>
+<tr><td>物体进封闭手 全局最大 (mm)</td><td>4.19032</td><td>2.21461</td><td>2.25525</td></tr>
+<tr><td>物体进封闭手 出现 &gt;2mm 的帧数</td><td>6</td><td>1</td><td>1</td></tr>
+</tbody></table></div>
+<p>JH 的穿透全点均值高于 J0，最大深度仍约 2.3–2.5 mm。小量深穿透保持在明细数组中。</p>
+<p>图：全段动作、观测和几何（来源：<code>results/joint_stage_comparison/joint_stage_overview.png</code>）</p>
+<p>图中检查 40 帧后的紫色 JH：物体 z 向真值靠近、手腕 z 向后移动，手物相对深度更接近真值。接触距离随之下降；腕速度误差和双向穿透显示这项几何收益的代价。接触图只绘制冻结的 40–73 帧。</p>
+<p>图：54到55帧附近（来源：<code>results/joint_stage_comparison/joint_stage_54_55.png</code>）</p>
+<p>54→55 pair：J0/JH 腕速度误差分别为 42.65/54.05 mm/s，物体为 173.98/168.19 mm/s。局部曲线保持连续，JH 在此处主要改变腕物相对深度；该 pair 的手部误差仍高于 J0。</p>
+<p>执行和固定身份：</p>
+<ul>
+<li>J0 300 次尝试、99 次接受（42 全步、57 回溯）、201 拒步，237.516 s；JH 300 次、167 接受（117 全步、50 回溯）、133 拒步，211.643 s。两条终态 receipt exit0。</li>
+<li>根任务复核每轮同权重完整目标均未增加，证据复用 <code>results/joint_geometry/formal_backtracking_audit.json</code>。不同组的总目标包含不同项。</li>
+<li>J0 最大手/物修正为 16.786/5.158 mm；JH 为 46.713/50.000 mm。形状、关节姿态、物体旋转、相机、原始帧/时间及有效集均通过固定身份检查。</li>
+<li>独立评价5项自检通过：微面距离及单位缩放、内外符号、移除手平移后的双向穿透、材料点与共同支持、区域及完整帧分母。</li>
+</ul>
+<p>证据：<code>metrics.json</code> 完整报告；<code>all_metrics.csv</code>/<code>all_metrics.md</code> 含 XYZ、幅度与速度全表；<code>source_54_55_window.csv</code> 邻帧明细；<code>compatible_contact_distances.npz</code> 与 <code>dense_penetration_per_query.npz</code> 原始距离；<code>independent_object_surface_2048.npz</code> 独立采样。所有数值基于同一开发片段；后续跨场景验证沿用冻结方法配置。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

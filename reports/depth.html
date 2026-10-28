@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>早期相对深度消融 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="depth.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">历史探索</span> · 来源 <code>results/depth_control_comparison/REPORT.md</code><p>新增深度项的收益、动态退化与有效支持变化。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">执行与固定条件</a><a href="#section-2">主结果</a><a href="#section-3">速度尾部：P95 与最坏帧分别报告</a><a href="#section-4">独立 CPU 真实 mesh depth-gap 验收</a><a href="#section-5">结论范围与下一步依据</a><a href="#section-6">文件</a></details><h1 id="section-0">Box 相对深度 C/D：完整评价</h1>
+<p>新增深度项使 D 的平均位置误差比继续优化对照 C 低 1.22 mm，z 方向运动幅度缩小 10.04 mm；<strong>z 速度误差略升，留出深度 pair 的完整支持率从 96.75% 降到 81.82%</strong>。按预先设定的 z 动态推进条件，当前结果应先反馈并诊断深度时序与支持丢失，再决定后续 A2。</p>
+<h2 id="section-1">执行与固定条件</h2>
+<ul>
+<li>C、D 均从最终 ObsRefine 初始化，各 300 步，退出码 0，耗时 160.21 / 164.10 s。两条终态确认后才读取预测并评分。</li>
+<li>两组只差新增深度损失权重：C 为 0/0，D 为 gap 0.20、ordering 0.05。预测生成不读取 GT。</li>
+<li>74 个原始帧、30 Hz、手、K、mesh、尺度和有效身份保持一致。C/D rotation 数组与 ObsRefine 逐值相同；全部非 object 字段逐字节相同。</li>
+<li>GT 仅用于统一评价；沿用既有 Raw 冻结 canonical offset。旋转分数与 ObsRefine 完全相同，ARE=0.74048 rad、RRE=0.05538 rad、camera angular velocity vector error=1.91040 rad/s。</li>
+<li>两组都未触及 100 mm 修正上限。</li>
+</ul>
+<h2 id="section-2">主结果</h2>
+<div class="table-wrap"><table><thead><tr><th>指标</th><th>ObsRefine</th><th>C：继续优化</th><th>D：新增深度</th></tr></thead><tbody>
+<tr><td>centroid position error (mm)</td><td>66.27</td><td>65.56</td><td>64.34</td></tr>
+<tr><td>centroid velocity vector error mean (mm/s)</td><td>241.78</td><td>236.79</td><td>237.78</td></tr>
+<tr><td>z velocity absolute error mean (mm/s)</td><td>212.47</td><td>207.66</td><td>209.36</td></tr>
+<tr><td>centroid velocity vector error P95 (mm/s)</td><td>684.70</td><td>679.77</td><td>667.01</td></tr>
+<tr><td>object z P95−P5 range (mm), GT=72.06</td><td>237.05</td><td>237.66</td><td>227.62</td></tr>
+<tr><td>object mean speed / GT</td><td>2.673</td><td>2.620</td><td>2.656</td></tr>
+<tr><td>hand-object relative joint position error (mm)</td><td>70.77</td><td>70.01</td><td>66.92</td></tr>
+<tr><td>hand-object relative joint velocity error (mm/s)</td><td>321.03</td><td>321.64</td><td>309.24</td></tr>
+<tr><td>original-resolution mask IoU</td><td>0.64917</td><td>0.65100</td><td>0.64541</td></tr>
+<tr><td>holdout RGB displacement EPE, pair-equal (px)</td><td>2.507</td><td>2.498</td><td>2.486</td></tr>
+</tbody></table></div>
+<p>D 相对 C：平均位置误差下降 1.86%，相对 joint position/velocity error 下降 4.42% / 3.86%；z 速度误差上升 0.82%，整体平均 velocity error 上升 0.42%。z 幅度仍为 GT 的约 3.16 倍。</p>
+<p>RGB 观测保持在本轮已设容差内：IoU 下降 0.00559（容差 0.02），留出 EPE 改善约 0.0123 px（允许增加 0.5 px）。这里 IoU 是训练拟合检查，RGB 留出轨迹是额外观测检查。</p>
+<h2 id="section-3">速度尾部：P95 与最坏帧分别报告</h2>
+<p>本表的 P95 是 <code class="math-source">\mathrm{P95}(\|v_{\mathrm{pred}}-v_{\mathrm{GT}}\|_2)</code>，使用真实相邻时间差；它与预测速度本身的 P95 分开保存。</p>
+<div class="table-wrap"><table><thead><tr><th>最高误差 source pair</th><th>midpoint (s)</th><th>ObsRefine (mm/s)</th><th>C (mm/s)</th><th>D (mm/s)</th></tr></thead><tbody>
+<tr><td>43 → 44</td><td>1.4500</td><td>871.04</td><td>878.58</td><td>1095.05</td></tr>
+<tr><td>44 → 45</td><td>1.4833</td><td>863.06</td><td>877.11</td><td>986.56</td></tr>
+<tr><td>42 → 43</td><td>1.4167</td><td>775.88</td><td>779.56</td><td>963.87</td></tr>
+</tbody></table></div>
+<p>D 的误差 P95 比 C 低 1.88%，但同一 43→44 pair 的最大误差高 24.64%。运动图第二排的线速度和最后一排的相对速度均能看到约 1.4–1.5 s 的额外尖峰。完整 top10 见 <code>velocity_error_tails.json</code>。</p>
+<h2 id="section-4">独立 CPU 真实 mesh depth-gap 验收</h2>
+<p>冻结输入共有 814 对 patch，覆盖 53/74 帧；训练 660、留出 154。固定序列 MoGe 尺度为 1.049088070840933。各条件使用同一像素、手表面深度、pair 和划分。</p>
+<p>CPU 验收对真实三角 mesh 建 BVH，按原 K 发出整数 RGB 像素中心射线，取最近正光轴深度。此路径与训练时的可微 hard zbuffer 分开；使用现有 CPU Embree。NPZ 的冻结 pixel set 中任一像素失去交点，整 pair 记缺失并罚 20；pair 原分母保留。median 在偶数像素数时取中间两值均值。</p>
+<p>初始化独立检查：814/814 pair 全像素支持。重算手深度的平均绝对差 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>1.79</mn><mo>×</mo><msup><mn>10</mn><mn>-5</mn></msup></mrow></math> mm；物体初始化 front 与冻结值 RMSE 为 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>2.96</mn><mo>×</mo><msup><mn>10</mn><mn>-5</mn></msup></mrow></math> mm。它支持当前整数像素与 optical-Z 契约一致。CPU 完整初始化验收耗时 0.271 s。</p>
+<div class="table-wrap"><table><thead><tr><th>留出 depth 指标</th><th>ObsRefine</th><th>C</th><th>D</th></tr></thead><tbody>
+<tr><td>固定 pair 分母</td><td>154</td><td>154</td><td>154</td></tr>
+<tr><td>全部 frozen pixels 仍有交点的 pair</td><td>154</td><td>149</td><td>126</td></tr>
+<tr><td>完整 pair coverage</td><td>100%</td><td>96.75%</td><td>81.82%</td></tr>
+<tr><td>平均 pixel hit fraction</td><td>100%</td><td>99.83%</td><td>96.25%</td></tr>
+<tr><td>条件 gap 绝对残差，pair mean (mm)</td><td>35.99</td><td>36.72</td><td>30.63</td></tr>
+<tr><td>条件 gap 绝对残差，frame-equal mean (mm)</td><td>36.71</td><td>37.47</td><td>30.21</td></tr>
+<tr><td>主 gap Huber，missing=20，frame-equal</td><td>3.1902</td><td>3.8025</td><td>6.2090</td></tr>
+<tr><td>ordering Huber，missing=20，frame-equal</td><td>0.5548</td><td>1.0866</td><td>4.0627</td></tr>
+</tbody></table></div>
+<p>D 在有完整支持的 pair 上残差较低，支持覆盖同时减少。原始 154 pair 分母下的 gap/ordering 主分数都上升。图中 0.7–1.5 s 的 D coverage 多处降低，有 5 个留出 frame 没有任何满足完整 pixel 要求的 pair；相应条件残差曲线保留缺口。</p>
+<p>附加的共同支持诊断固定取三组都支持的 123 个留出 pair、48 帧，frame-equal gap 残差为 ObsRefine 34.57、C 34.69、D 30.41 mm。它说明 D 拟合了一部分新增深度观测；主评价仍保留全部 154 pair 的 missing20 分数。</p>
+<h2 id="section-5">结论范围与下一步依据</h2>
+<p>这一轮同时观察到：D 的位置与相对几何小幅改善、RGB 保真保持，z 速度和全分母深度损失未改善，最坏速度错误变大。当前证据适合优先检查 MoGe 相对深度的时序变化、固定手深度误差，以及 frozen-pixel 支持丢失的来源，再决定联合位置或尺度/姿态分支。实验范围为这一条开发 box 视频。</p>
+<h2 id="section-6">文件</h2>
+<ul>
+<li><code>all_metrics.csv</code>、<code>dexycb_box.json/.md</code>：Obs/C/D 的完整 XYZ、幅度、速度、角速度、相对及 RGB 数值。</li>
+<li><code>velocity_error_tails.json</code>：速度向量误差 P95、预测速度 P95 和 top10 原始 source pairs。</li>
+<li><code>identity_checks.json</code>：终态、rotation 与全部非 object 字段的固定条件检查。</li>
+<li><code>motion_comparison.png/.pdf</code>、<code>motion_curves.csv</code>：Obs/C/D/GT 同步曲线，已实际打开检查。</li>
+<li><code>depth_gap_metrics.json</code>、<code>depth_gap_per_pair.csv</code>：独立 CPU 真 mesh 留出验收；<code>depth_gap_curves.png/.pdf</code> 已实际打开检查。</li>
+<li><code>depth_gap_common_support_diagnostic.json</code>：三组共同支持的单独诊断。</li>
+<li><code>initialization_cpu_embree/</code>：初始化独立射线验收记录。</li>
+</ul>
+<p>慢速 Rtree CPU 初始检查在现有 Embree 完整验收成功后停止；没有动用 GPU，也没有修改 patch、旧项目或模型。C/D 和所有评分产物均保留于本地与 L40S 新任务目录。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

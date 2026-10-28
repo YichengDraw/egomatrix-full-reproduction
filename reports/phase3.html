@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>参考姿态与执行误差分解 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="phase3.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">误差归因</span> · 来源 <code>claude_work/RESULTS_PHASE3_20261026.md</code><p>逐对象区分重建漂移与物理抓持偏差，检验通用离散翻转修复。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">Q1：参考自身与物理跟踪的分解</a><a href="#section-4">Q2：实际执行的通用修复</a><a href="#section-5">Q3：修复前后评分与交付</a><a href="#section-6">遗留问题与建议</a></details><h1 id="section-0">EgoMatrix 第三阶段：旋转失败分解与通用修复结果</h1>
+<p>本阶段已完成 Q1 分解、统一翻转修复和修复后独立评分，并触发简报的重建停止条件：<strong>主例与 cut 的参考自身超出论文判据，通用半转修复后仍失败。</strong> brush 的参考双对象通过，其右刷失败归于物理跟踪和抓持。现有真实 rollout 的论文成功率保持 <strong>0/3</strong>；本阶段 GPU 用时为 <strong>0 小时</strong>。</p>
+<p>这一结果修正了“右侧三个失败都是同一种 π 翻转”的初始假设：主例左碗参考也有大幅旋转漂移，刷子的参考则准确。后续应分别处理重建和抓持。</p>
+<h2 id="section-1">Q1：参考自身与物理跟踪的分解</h2>
+<p>“参考天花板”在这里指把 RL 实际消费参考当作 rollout，直接调用原论文 scorer 评分。源时刻取自冻结900轮真实 trace，覆盖主例249、cut200、brush209个原RGB帧。平移采用物体网格的面积加权表面质心。</p>
+<p>参考对GT评分按论文规定共同对齐世界坐标；仿真对参考直接使用同一个仿真世界和物体局部坐标。两类误差各自计算。</p>
+<p>完整任务成功要求两对象在全部原RGB帧的平移误差低于0.10m、旋转误差低于1.0rad。</p>
+<div class="table-wrap"><table><thead><tr><th>任务</th><th>手/对象</th><th>参考对GT最大平移 mm</th><th>参考对GT最大旋转 rad</th><th>参考判据</th><th>仿真对参考平移均值 mm</th><th>仿真对参考旋转均值 rad</th><th>相邻源帧 π 翻转数</th><th>归因</th></tr></thead><tbody>
+<tr><td>主例</td><td>左/024 碗</td><td>30.54</td><td>2.9369</td><td>失败</td><td>21.77</td><td>1.4375</td><td>0</td><td>参考轴向旋转漂移；实际碗基本静置，对GT通过</td></tr>
+<tr><td>主例</td><td>右/032 勺</td><td>104.87</td><td>2.4350</td><td>失败</td><td>66.44</td><td>0.8984</td><td>0</td><td>重建参考偏差与RL跟踪偏差同时存在</td></tr>
+<tr><td>cut</td><td>左/049 板</td><td>34.91</td><td>0.0698</td><td>通过</td><td>31.62</td><td>0.0448</td><td>0</td><td>参考和最终物体评分均通过</td></tr>
+<tr><td>cut</td><td>右/122 刀</td><td>65.49</td><td>1.7906</td><td>失败</td><td>30.65</td><td>0.6607</td><td>0</td><td>参考旋转失败，另有早期及末段RL旋转偏差</td></tr>
+<tr><td>brush</td><td>左/146 容器</td><td>39.08</td><td>0.2683</td><td>通过</td><td>31.50</td><td>0.1317</td><td>0</td><td>参考和最终物体评分均通过</td></tr>
+<tr><td>brush</td><td>右/071 刷</td><td>44.23</td><td>0.3828</td><td>通过</td><td>80.29</td><td>2.1701</td><td>0</td><td>RL未持续抓持，物体翻面并偏离参考</td></tr>
+</tbody></table></div>
+<p>参考完整任务通过1/3、对象分支通过3/6。主例左碗说明：参考自身评分与实际仿真评分可以因运动不同而得到相反结论，“参考天花板”是诊断基准。原简报提到的 A3_smoothed ARE 主例1.37rad、cut0.675rad为双对象均值，本次逐对象均值分别合成1.369594和0.674786rad，数值一致。</p>
+<p>逐源帧曲线已实际查看：主例（来源：<code>claude_work/phase3/q1_scoring/main_decomposition.png</code>）、cut（来源：<code>claude_work/phase3/q1_scoring/cut_decomposition.png</code>）、brush（来源：<code>claude_work/phase3/q1_scoring/brush_decomposition.png</code>）。各图上排为参考对GT，中排为仿真对参考。主例左参考在约5秒后逐步偏至2.9rad；cut右参考约1秒后持续超出1rad；brush右参考全程低于0.4rad，实际物体随后产生约0.2m位置误差和接近π的旋转误差。这些趋势支持表中的不同归因。</p>
+<h3 id="section-2">评分与坐标契约</h3>
+<p>论文 Appendix C（来源：<code>sources/paper.txt</code>）明确要求：全部对象共享一次固定尺度刚体世界对齐；每对象用首共同有效帧消除固定局部朝向偏置；旋转采用完整三维旋转角；对称性按原论文规则计入旋转误差。现有 score_arrays（来源：<code>code/evaluate_policy_transfer.py</code>） 和 trajectories（来源：<code>code/evaluate_appendix_c.py</code>） 与该文本一致，本轮保留原 scorer。</p>
+<p>六对象 canonical mesh、安装OBJ与USD刚体根坐标一致，最大顶点差小于 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>8.2</mn><mo>×</mo><msup><mn>10</mn><mn>-9</mn></msup></mrow></math> m。原始SAM3D网格到canonical的缩放/平移矩阵、逐对象首帧朝向矩阵、既有GT网格形状对齐矩阵及来源均保存在 mesh汇总（来源：<code>claude_work/phase3/q1_mesh/summary.json</code>） 和 形状Sim(3)矩阵（来源：<code>claude_work/phase3/q1_mesh/existing_shape_sim3.json</code>）。形状对齐沿用既有评估，轨迹继续使用论文规定的世界与首帧对齐。</p>
+<p>固定局部坐标旋转由首帧偏置抵消：对每对象全部预测朝向右乘同一固定旋转，重新评分后 ARE 的最大变化仅 <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3.11</mn><mo>×</mo><msup><mn>10</mn><mn>-15</mn></msup></mrow></math> rad。另将锚点预先固定换为第二源帧，仅做评价敏感性检查，主例右、cut右、brush右的最大旋转分别为2.4323、1.8132、0.3860rad，判定均保持。相应两帧偏置差只有0.0032、0.0291、0.0032rad。当前证据支持持续姿态偏差和物理偏离。</p>
+<h3 id="section-3">π 误差的几何与时间来源</h3>
+<p>从 FoundationPose/A1、Scene、A2、A3直到全部60Hz消费参考，六对象均无单步超过1rad的旋转；近π跳变检测阈值统一为2.5rad，检出数全部为0。最终参考的最大相邻源帧旋转为0.2758rad。原900轮的近π误差可以随时间逐渐形成。</p>
+<div class="table-wrap"><table><thead><tr><th>右对象</th><th>绕长轴半转后表面距离p95：重建/GT mm</th><th>900轮近π误差轴与GT长轴的绝对余弦中位数</th><th>结论</th></tr></thead><tbody>
+<tr><td>勺032</td><td>22.38 / 31.44</td><td>0.851，84帧</td><td>误差较接近长轴方向；两网格均未通过半转几何等价检验</td></tr>
+<tr><td>刀122</td><td>6.20 / 10.33</td><td>0.955，2帧</td><td>末段误差接近长轴半转；刀刃几何仍有明显变化</td></tr>
+<tr><td>刷071</td><td>11.16 / 15.86</td><td>0.085，156帧</td><td>误差轴接近薄轴，薄轴余弦0.996，属于翻面</td></tr>
+</tbody></table></div>
+<p>绝对余弦越接近1，误差轴越接近该物体轴；统计帧限定旋转误差大于2.5rad。刷子对参考的近π误差同样沿薄轴，余弦0.998。</p>
+<p>左碗024的重建和GT均通过已有连续轴对称检测，轴分别约为各自局部Y轴、Z轴；参考近π误差轴与GT对称轴余弦0.963。这支持碗的主要问题为轴向自转漂移。论文使用完整旋转评分，主结果按这一规则保留失败。几何图与逐轴测试见 mesh报告（来源：<code>claude_work/phase3/q1_mesh/REPORT.md</code>）、形状对齐图（来源：<code>claude_work/phase3/q1_mesh/existing_shape_sim3_overlays.png</code>）、相邻旋转与累计误差（来源：<code>claude_work/phase3/q1_mesh/sequence_rotation_diagnostics.png</code>）。形状对齐图展示局部坐标不同及形状差异；旋转曲线展示小步偏差累积成大角度误差。</p>
+<h2 id="section-4">Q2：实际执行的通用修复</h2>
+<p>新增独立重建后处理分支 apply_discrete_pi.py（来源：<code>claude_work/phase3/temporal_fix/apply_discrete_pi.py</code>），显式开关 <code>--enable-discrete-pi-continuity</code>，默认关闭。类别为“论文未说明的通用实现选择”。该程序读取重建网格几何与消费参考；GT只在分支输出后的独立评分读取。</p>
+<p>统一规则为：从重建网格的三个主轴中选择通过近似半转几何检验的候选，围绕局部表面质心轴执行完整刚体半转；首帧保持原值；仅在当前单步旋转≥2.5rad、替代候选≤0.5rad且降低≥2rad时切换。渐进真实旋转按原值保留。三个任务双对象采用同一规则。</p>
+<p>实际执行结果为<strong>切换0次、修改0帧</strong>。三个新参考各60个数组均与原输入逐项相等。偏心旋转轴、人工插入π翻转、真实连续整圈转动、默认关闭和几何候选拒绝这五项已知运动验证全部通过。见 修复报告（来源：<code>claude_work/phase3/temporal_fix/REPORT.md</code>）、执行清单（来源：<code>claude_work/phase3/temporal_fix/repair_manifest.json</code>）、验证回执（来源：<code>claude_work/phase3/temporal_fix/repair_validation.json</code>）。</p>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>开关或用途</th><th>类别与结果</th></tr></thead><tbody>
+<tr><td><code>phase3/temporal_fix/apply_discrete_pi.py</code></td><td><code>--enable-discrete-pi-continuity</code></td><td>通用重建后处理；已执行，输入无适用翻转，输出恒等</td></tr>
+<tr><td><code>phase3/temporal_fix/audit_temporal.py</code>、<code>validate_repair.py</code></td><td>原阶段时序审计、已知运动验证</td><td>CPU诊断</td></tr>
+<tr><td><code>phase3/q1_scoring/decompose_frozen.py</code>、<code>score_corrected.py</code></td><td>消费参考评分、同入口修前后复评</td><td>复用原论文scorer，GT仅评价</td></tr>
+<tr><td><code>phase3/q1_mesh/audit_mesh_contract.py</code>、<code>supplement_axis_and_shape.py</code></td><td>几何对称性、坐标来源、误差轴和既有形状矩阵</td><td>只读审计</td></tr>
+</tbody></table></div>
+<p>新参考位于 <code>phase3/temporal_fix/corrected_reference/TACO_task0-{0,1,2}/actual_rl_reference.npz</code>。RL、retarget、奖励参数与物理默认保持原配置。</p>
+<h2 id="section-5">Q3：修复前后评分与交付</h2>
+<p>评分程序已实际读取三个新参考，并对原文件使用同一入口评分。六对象的ATE、ARE、RTE、RRE逐帧数组全部严格相等，见 修前后比较（来源：<code>claude_work/phase3/q1_scoring/corrected_reference_comparison.json</code>）。下表采用同一原/修复文件入口：</p>
+<div class="table-wrap"><table><thead><tr><th>任务</th><th>原参考：最坏平移 mm / 旋转 rad</th><th>修后参考：最坏平移 mm / 旋转 rad</th><th>参考完整任务判据：前→后</th><th>既有900轮真实rollout：最坏平移 mm / 旋转 rad</th><th>真实rollout判据</th></tr></thead><tbody>
+<tr><td>主例</td><td>104.87 / 2.9369</td><td>104.87 / 2.9369</td><td>失败→失败</td><td>162.96 / 3.1265</td><td>失败</td></tr>
+<tr><td>cut</td><td>65.49 / 1.7906</td><td>65.49 / 1.7906</td><td>失败→失败</td><td>81.53 / 2.9806</td><td>失败</td></tr>
+<tr><td>brush</td><td>44.23 / 0.3828</td><td>44.23 / 0.3828</td><td>通过→通过</td><td>150.66 / 3.1329</td><td>失败</td></tr>
+</tbody></table></div>
+<p>原文件与修后文件严格相等；主Q1表则来自真实trace消费字段，两入口有微小浮点表示差，位置最大约1.03µm、旋转矩阵元素最大约0.000316，所有判定一致。</p>
+<p>通用修复后，主例与cut参考仍达不到判据，已触发原简报停止条件。本轮到此结束，后续retarget和C3重训未启动。brush按简报中独立抓持问题条款单列。表中真实rollout均复用第二阶段已冻结结果。</p>
+<p>Appendix C 对象运动均值如下。ATE/ARE为绝对位置/旋转误差，RTE/RRE为相邻源帧相对运动误差；平移单位mm、旋转单位rad。参考修前修后相等；真实rollout四项均复用冻结900轮评分。</p>
+<div class="table-wrap"><table><thead><tr><th>任务/对象</th><th>参考 ATE</th><th>参考 ARE</th><th>参考 RTE</th><th>参考 RRE</th><th>真实rollout ATE</th><th>真实rollout ARE</th><th>真实rollout RTE</th><th>真实rollout RRE</th></tr></thead><tbody>
+<tr><td>主例 左024</td><td>20.539</td><td>1.401212</td><td>2.547</td><td>0.047934</td><td>23.452</td><td>0.144867</td><td>0.935</td><td>0.017908</td></tr>
+<tr><td>主例 右032</td><td>60.562</td><td>1.337976</td><td>5.265</td><td>0.060759</td><td>83.213</td><td>1.934009</td><td>6.912</td><td>0.108426</td></tr>
+<tr><td>cut 左049</td><td>16.760</td><td>0.045072</td><td>1.991</td><td>0.004573</td><td>7.242</td><td>0.037570</td><td>0.199</td><td>0.002566</td></tr>
+<tr><td>cut 右122</td><td>35.772</td><td>1.304499</td><td>4.311</td><td>0.039208</td><td>30.659</td><td>1.204176</td><td>4.599</td><td>0.097363</td></tr>
+<tr><td>brush 左146</td><td>12.347</td><td>0.093979</td><td>2.182</td><td>0.012281</td><td>33.919</td><td>0.126453</td><td>1.195</td><td>0.019242</td></tr>
+<tr><td>brush 右071</td><td>14.738</td><td>0.229779</td><td>4.838</td><td>0.033597</td><td>67.964</td><td>2.266629</td><td>5.487</td><td>0.044927</td></tr>
+</tbody></table></div>
+<p>参考表列采用Q1真实消费口径。ATE/ARE有效分母为249/200/209帧，RTE/RRE为248/199/208帧对；完整逐帧值、RMSE和p95见 <code>phase3/q1_scoring/*_reference_ceiling.json</code> 与 <code>*_corrected_reference_score.json</code>。真实rollout原值见 第二阶段最终评分（来源：<code>claude_work/phase2/p3/FINAL_THREE_TASK_SCORES.json</code>）。</p>
+<p>本轮物体参考和仿真轨迹均无变化，主例完整合成视频沿用 composite.mp4（来源：<code>claude_work/phase2/p3/final_main900_video/video/composite.mp4</code>），1280×720、30fps、249帧、8.3秒；完整解码回执和多帧查看记录沿用 原视频报告（来源：<code>claude_work/phase2/p3/final_main900_video/REPORT.md</code>）。</p>
+<p>交付入口为本报告、阶段状态（来源：<code>claude_work/phase3/status.md</code>）、Q1评分报告（来源：<code>claude_work/phase3/q1_scoring/REPORT.md</code>）、mesh报告（来源：<code>claude_work/phase3/q1_mesh/REPORT.md</code>）和修复报告（来源：<code>claude_work/phase3/temporal_fix/REPORT.md</code>）。同一结构同步于远端 <code>claude_work/</code>。</p>
+<h2 id="section-6">遗留问题与建议</h2>
+<p>主例与cut需要更广范围的重建姿态改进。当前论文与公开实现的A2物体旋转修正上限为12°，多起点主要变化为沿相机射线的平移；这类局部优化难以修复持续的大幅朝向偏差。建议独立建立更广的旋转候选、遮挡后重新定位和多帧姿态优化实验，继续以RGB轮廓、可见表面、深度与时间一致性选候选，冻结后再评分；主例同时保留无尺度对齐的物体尺寸审查。</p>
+<p>左碗轴向自转可另报对称性感知诊断，论文完整旋转判据继续保留。brush优先研究实际指腹接触、抬起时的抗翻转力矩和放下阶段的物理跟踪。现有数据已将brush的参考误差与实际抓持失败分开，后续可在固定C3基础上设计少量通用控制对照。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

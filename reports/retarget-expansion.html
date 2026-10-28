@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cut与Brush重定向扩展 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="retarget-expansion.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">机器人重定向</span> · 来源 <code>claude_work/phase2/p2b/EXPANSION_REPORT.md</code><p>相同接触配置扩展至另外两段，记录桌面修复预算和参考质量。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">同目标数值接续与原失败</a></details><h1 id="section-0">P3 cut / brush 接触 retarget 扩展</h1>
+<p>主例触发 P3 后，两任务四手使用相同接触配置和求解预算生成独立参考。原主例 <code>REPORT.md</code>、审计和曲线保留。CPU运行与真实RL loader导出均已完成；独立GT未在本阶段读取。</p>
+<p>通用参数：MANO指尖表面距物体 ≤5 mm激活，末指节指腹目标内压3 mm，接触损失权重5；每帧300次，首帧3000次，table repair1200次，使用各自T2选定native reverse种子。</p>
+<div class="table-wrap"><table><thead><tr><th>任务</th><th>手</th><th>实际参考帧数</th><th>0.7门槛失败帧</th><th>原训练门槛最大比</th><th>T2→B指尖误差中位mm</th></tr></thead><tbody>
+<tr><td>TACO_task0-1</td><td>lh</td><td>399</td><td>0</td><td>0.270</td><td>0.661→3.508</td></tr>
+<tr><td>TACO_task0-1</td><td>rh</td><td>399</td><td>0</td><td>0.448</td><td>6.713→7.104</td></tr>
+<tr><td>TACO_task0-2</td><td>lh</td><td>417</td><td>0</td><td>0.536</td><td>4.782→7.066</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>417</td><td>0</td><td>0.473</td><td>5.185→6.072</td></tr>
+</tbody></table></div>
+<p>负表面距离表示指腹进入物体内侧；几何表和曲线采用MANO真实近表面帧中的固定指腹对应点。</p>
+<div class="table-wrap"><table><thead><tr><th>任务</th><th>手</th><th>指</th><th>激活native帧</th><th>T2→B指腹有符号距离中位mm</th></tr></thead><tbody>
+<tr><td>TACO_task0-1</td><td>rh</td><td>thumb</td><td>95</td><td>2.483→-2.976</td></tr>
+<tr><td>TACO_task0-1</td><td>rh</td><td>index</td><td>34</td><td>0.559→-0.474</td></tr>
+<tr><td>TACO_task0-1</td><td>rh</td><td>ring</td><td>2</td><td>2.957→-0.354</td></tr>
+<tr><td>TACO_task0-1</td><td>rh</td><td>pinky</td><td>1</td><td>-1.377→-3.000</td></tr>
+<tr><td>TACO_task0-1</td><td>lh</td><td>thumb</td><td>4</td><td>0.571→-1.085</td></tr>
+<tr><td>TACO_task0-1</td><td>lh</td><td>index</td><td>78</td><td>3.232→-2.998</td></tr>
+<tr><td>TACO_task0-1</td><td>lh</td><td>middle</td><td>181</td><td>4.396→-0.568</td></tr>
+<tr><td>TACO_task0-1</td><td>lh</td><td>ring</td><td>180</td><td>0.702→-3.001</td></tr>
+<tr><td>TACO_task0-1</td><td>lh</td><td>pinky</td><td>49</td><td>0.384→-1.548</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>thumb</td><td>120</td><td>0.777→0.350</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>index</td><td>98</td><td>0.308→0.084</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>middle</td><td>38</td><td>0.440→0.140</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>ring</td><td>17</td><td>3.041→0.705</td></tr>
+<tr><td>TACO_task0-2</td><td>rh</td><td>pinky</td><td>3</td><td>5.552→7.474</td></tr>
+<tr><td>TACO_task0-2</td><td>lh</td><td>thumb</td><td>96</td><td>3.478→-0.153</td></tr>
+<tr><td>TACO_task0-2</td><td>lh</td><td>index</td><td>103</td><td>7.520→0.266</td></tr>
+<tr><td>TACO_task0-2</td><td>lh</td><td>middle</td><td>13</td><td>-0.505→0.725</td></tr>
+<tr><td>TACO_task0-2</td><td>lh</td><td>ring</td><td>2</td><td>2.812→6.788</td></tr>
+</tbody></table></div>
+<p>配置比对：<code>all_tasks_contact_config_comparison.json</code>；三个任务六手的optimizer_config完全一致。</p>
+<p>交付：<code>retarget_contact_v1/</code>、<code>actual_reference_contact_v1/</code>、<code>task_audits/&lt;task&gt;/audit_contact.json</code>、<code>cut_contact_surface_audit.json</code>、<code>brush_contact_surface_audit.json</code>、<code>cut_contact_surface_curves.png</code>、<code>brush_contact_surface_curves.png</code>。</p>
+<p>合并入口：<code>all_tasks_actual_reference_audit.json</code>、<code>all_tasks_contact_surface_audit.json</code>。物理和PPO效果由同C3配置的训练评估阶段验收。</p>
+<h2 id="section-1">同目标数值接续与原失败</h2>
+<p>brush LH 原1200步 table repair 失败日志保留在 <code>logs/TACO_task0-2_lh.log</code>：帧289、290仍未满足1 mm clearance，最大违反0.88528 mm。原T2 brush LH 使用相同clearance、64点/link、50 µm容差与1200预算，最终最大46.67 µm通过。</p>
+<p>本次复用已完成native结果，将各输出帧独立的原table repair分到8CPU；原1200后仍无可行姿态时，保留同一Adam状态、同一preservation参考和权重继续。帧289、290分别只额外81、110步即找到可行姿态，未用硬投影。全417帧最终table clearance违反最大49.6507 µm，全部低于原50 µm容差。</p>
+<p>新增 <code>retarget.py --upsample-table-repair-continuation-iterations</code>，默认0；本轮统一启用最多1200额外步，仅原预算无可行姿态时触发。main、cut及brush RH原已通过的导出直接复用。三任务相同导出规则与实际触发记录见 <code>all_tasks_export_policy.json</code> 和各 <code>task_audits/&lt;task&gt;/export_manifest.json</code>。接触配置与原300/3000预算完全不变；原table初始预算仍为1200。</p>
+<div class="table-wrap"><table><thead><tr><th>brush LH实际60Hz帧</th><th>额外Adam步</th><th>最终clearance违反µm</th><th>五指中最大MANO误差mm</th><th>激活食指指腹到物体表面mm</th><th>食指到名义接触目标mm</th></tr></thead><tbody>
+<tr><td>289</td><td>81</td><td>18.179</td><td>40.293</td><td>+3.335</td><td>6.899</td></tr>
+<tr><td>290</td><td>110</td><td>48.995</td><td>41.143</td><td>+2.716</td><td>5.992</td></tr>
+</tbody></table></div>
+<p>这里食指表面距离正值表示仍在物体外侧；table修复后的两帧仍保留这项接触残差。奇数60Hz帧采用相邻native局部接触点与目标线性插值、任邻激活，偶数帧精确对应native，定义与数值见 <code>brush_continuation_affected_frames.json</code>。</p>
+<p>cut与brush的曲线已实际查看。cut左中/无名指的多数接触帧由物体外侧移向内压目标；brush左拇/食指的大多数原外距明显下降，部分时刻仍存在数毫米残差。固定3 mm法线位移在薄、非封闭物体网格上对应的实际有符号最近距离可接近0或略为正，原始几何统计完整保留，所有任务继续使用同一目标构造。</p>
+<p>源码最小增量：<code>extension_numerical_changes.patch</code>；初始B源码patch与主例 <code>REPORT.md</code> 保留。本阶段CPU任务均已结束，cut/brush actual参考已同步本地并交训练owner接续同C3训练。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

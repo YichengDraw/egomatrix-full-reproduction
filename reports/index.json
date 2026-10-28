@@ -1,0 +1,164 @@
+[
+  {
+    "id": "final",
+    "title": "全链路最终复现报告",
+    "stage": "最终结果",
+    "href": "reports/final.html",
+    "download": "reports/final.md",
+    "summary": "完整流程、方法忠实度、三段最终轨迹、论文指标与停止依据。",
+    "source": "claude_work/FINAL_REPRODUCTION_REPORT.md"
+  },
+  {
+    "id": "phase2",
+    "title": "接触与双手RL：第二阶段",
+    "stage": "机器人执行",
+    "href": "reports/phase2.html",
+    "download": "reports/phase2.md",
+    "summary": "接触诊断、指腹重定向与统一控制组合，三段完整执行及独立评分。",
+    "source": "claude_work/RESULTS_RL_PHASE2_20261025.md"
+  },
+  {
+    "id": "phase3",
+    "title": "参考姿态与执行误差分解",
+    "stage": "误差归因",
+    "href": "reports/phase3.html",
+    "download": "reports/phase3.md",
+    "summary": "逐对象区分重建漂移与物理抓持偏差，检验通用离散翻转修复。",
+    "source": "claude_work/RESULTS_PHASE3_20261026.md"
+  },
+  {
+    "id": "phase4",
+    "title": "第四阶段最终结果",
+    "stage": "最终对照",
+    "href": "reports/phase4.html",
+    "download": "reports/phase4.md",
+    "summary": "FoundationPose有限对照、刷子控制消融、跨任务采用决定与最终交付。",
+    "source": "claude_work/RESULTS_PHASE4_20261026.md"
+  },
+  {
+    "id": "contact-diagnostic",
+    "title": "手与物体到底有多远",
+    "stage": "接触诊断",
+    "href": "reports/contact-diagnostic.html",
+    "download": "reports/contact-diagnostic.md",
+    "summary": "真实表面距离、全手接触力与传感器正控制，定位抓持形成问题。",
+    "source": "claude_work/phase2/p1/REPORT.md"
+  },
+  {
+    "id": "contact-retarget",
+    "title": "通用接触感知重定向",
+    "stage": "机器人重定向",
+    "href": "reports/contact-retarget.html",
+    "download": "reports/contact-retarget.md",
+    "summary": "在原关键点目标上增加统一指腹接触项，保存参考与实查曲线。",
+    "source": "claude_work/phase2/p2b/REPORT.md"
+  },
+  {
+    "id": "retarget-expansion",
+    "title": "Cut与Brush重定向扩展",
+    "stage": "机器人重定向",
+    "href": "reports/retarget-expansion.html",
+    "download": "reports/retarget-expansion.md",
+    "summary": "相同接触配置扩展至另外两段，记录桌面修复预算和参考质量。",
+    "source": "claude_work/phase2/p2b/EXPANSION_REPORT.md"
+  },
+  {
+    "id": "tracking-origin",
+    "title": "物体姿态漂移从哪里开始",
+    "stage": "物体跟踪",
+    "href": "reports/tracking-origin.html",
+    "download": "reports/tracking-origin.md",
+    "summary": "贯穿A1至控制参考的逐对象评分、传播分支及姿态漂移来源。",
+    "source": "claude_work/phase4/r1/REPORT.md"
+  },
+  {
+    "id": "tracking-fidelity",
+    "title": "论文与公开跟踪代码对照",
+    "stage": "方法忠实度",
+    "href": "reports/tracking-fidelity.html",
+    "download": "reports/tracking-fidelity.md",
+    "summary": "逐项核查FP注册、传播、细化、候选评分和遮挡解释。",
+    "source": "claude_work/phase4/r2/PAPER_TRACKING_AUDIT.md"
+  },
+  {
+    "id": "control-ablation",
+    "title": "刷子抓持控制对照",
+    "stage": "控制消融",
+    "href": "reports/control-ablation.html",
+    "download": "reports/control-ablation.md",
+    "summary": "残差倍率与全接触净力对照，刷子持物改善和跨任务门槛结果。",
+    "source": "claude_work/phase4/r3/REPORT.md"
+  },
+  {
+    "id": "reconstruction-metrics",
+    "title": "重建十项与论文Table2",
+    "stage": "评价协议",
+    "href": "reports/reconstruction-metrics.html",
+    "download": "reports/reconstruction-metrics.md",
+    "summary": "完整三段重建的十项指标、统一聚合口径及作者汇总对比。",
+    "source": "claude_work/phase4/r4/RECONSTRUCTION_TABLE.md"
+  },
+  {
+    "id": "initial-rl",
+    "title": "初版RL执行与失败记录",
+    "stage": "历史RL",
+    "href": "reports/initial-rl.html",
+    "download": "reports/initial-rl.md",
+    "summary": "物理初始化、双向参考和500轮训练的原始阶段结果。",
+    "source": "claude_work/RESULTS_RL_20261025.md"
+  },
+  {
+    "id": "aligned-depth",
+    "title": "Aligned-depth三段完整链对照",
+    "stage": "重建对照",
+    "href": "reports/aligned-depth.html",
+    "download": "reports/aligned-depth.md",
+    "summary": "统一深度尺度输入的完整Scene至API对照，保留混合变化。",
+    "source": "results/ALIGNED_TEACHER_THREE_FULL_CHAIN_SUMMARY_20261025.md"
+  },
+  {
+    "id": "first-baseline",
+    "title": "首轮完整重建与API基线",
+    "stage": "历史基线",
+    "href": "reports/first-baseline.html",
+    "download": "reports/first-baseline.md",
+    "summary": "A1至A3、真实消费参考、原核审计和最初9步API失败。",
+    "source": "results/FIRST_FULL_BASELINE_STATUS_20261024.md"
+  },
+  {
+    "id": "observation",
+    "title": "早期物体观测修正",
+    "stage": "历史探索",
+    "href": "reports/observation.html",
+    "download": "reports/observation.md",
+    "summary": "两条开发短段的低通与RGB观测修正，保留深度幅度和速度尾部偏差。",
+    "source": "results/three_way_dynamic/REPORT.md"
+  },
+  {
+    "id": "depth",
+    "title": "早期相对深度消融",
+    "stage": "历史探索",
+    "href": "reports/depth.html",
+    "download": "reports/depth.md",
+    "summary": "新增深度项的收益、动态退化与有效支持变化。",
+    "source": "results/depth_control_comparison/REPORT.md"
+  },
+  {
+    "id": "joint-translation",
+    "title": "早期腕物联合平移",
+    "stage": "历史探索",
+    "href": "reports/joint-translation.html",
+    "download": "reports/joint-translation.md",
+    "summary": "粗接触的物体/相对运动收益与手部误差代价。",
+    "source": "results/joint_stage_comparison/REPORT.md"
+  },
+  {
+    "id": "static",
+    "title": "早期静止段约束",
+    "stage": "历史探索",
+    "href": "reports/static.html",
+    "download": "reports/static.md",
+    "summary": "静止约束消除假平移，同时损失投影覆盖，按原门槛拒绝候选。",
+    "source": "results/static_stage_comparison/REPORT.md"
+  }
+]

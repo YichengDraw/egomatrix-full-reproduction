@@ -1,0 +1,158 @@
+{
+  "schema": "report-static-qa-v1",
+  "reports": 18,
+  "html_pages": 19,
+  "markdown_downloads": 18,
+  "absolute_private_path_or_account_leaks": [],
+  "broken_local_links": [],
+  "original_structure_preserved": true,
+  "source_figures": "No stable published-media mapping supplied; images converted to visible relative source citations.",
+  "html_js_dependencies": 0,
+  "access_permissions_changed": false,
+  "reports_checked": [
+    {
+      "id": "final",
+      "source": "claude_work/FINAL_REPRODUCTION_REPORT.md",
+      "original_heading_count": 12,
+      "export_heading_count": 12,
+      "original_table_line_count": 65,
+      "export_table_line_count": 65
+    },
+    {
+      "id": "phase2",
+      "source": "claude_work/RESULTS_RL_PHASE2_20261025.md",
+      "original_heading_count": 8,
+      "export_heading_count": 8,
+      "original_table_line_count": 42,
+      "export_table_line_count": 42
+    },
+    {
+      "id": "phase3",
+      "source": "claude_work/RESULTS_PHASE3_20261026.md",
+      "original_heading_count": 7,
+      "export_heading_count": 7,
+      "original_table_line_count": 32,
+      "export_table_line_count": 32
+    },
+    {
+      "id": "phase4",
+      "source": "claude_work/RESULTS_PHASE4_20261026.md",
+      "original_heading_count": 5,
+      "export_heading_count": 5,
+      "original_table_line_count": 12,
+      "export_table_line_count": 12
+    },
+    {
+      "id": "contact-diagnostic",
+      "source": "claude_work/phase2/p1/REPORT.md",
+      "original_heading_count": 4,
+      "export_heading_count": 4,
+      "original_table_line_count": 15,
+      "export_table_line_count": 15
+    },
+    {
+      "id": "contact-retarget",
+      "source": "claude_work/phase2/p2b/REPORT.md",
+      "original_heading_count": 4,
+      "export_heading_count": 4,
+      "original_table_line_count": 11,
+      "export_table_line_count": 11
+    },
+    {
+      "id": "retarget-expansion",
+      "source": "claude_work/phase2/p2b/EXPANSION_REPORT.md",
+      "original_heading_count": 2,
+      "export_heading_count": 2,
+      "original_table_line_count": 30,
+      "export_table_line_count": 30
+    },
+    {
+      "id": "tracking-origin",
+      "source": "claude_work/phase4/r1/REPORT.md",
+      "original_heading_count": 5,
+      "export_heading_count": 5,
+      "original_table_line_count": 31,
+      "export_table_line_count": 31
+    },
+    {
+      "id": "tracking-fidelity",
+      "source": "claude_work/phase4/r2/PAPER_TRACKING_AUDIT.md",
+      "original_heading_count": 15,
+      "export_heading_count": 15,
+      "original_table_line_count": 35,
+      "export_table_line_count": 35
+    },
+    {
+      "id": "control-ablation",
+      "source": "claude_work/phase4/r3/REPORT.md",
+      "original_heading_count": 3,
+      "export_heading_count": 3,
+      "original_table_line_count": 27,
+      "export_table_line_count": 27
+    },
+    {
+      "id": "reconstruction-metrics",
+      "source": "claude_work/phase4/r4/RECONSTRUCTION_TABLE.md",
+      "original_heading_count": 0,
+      "export_heading_count": 0,
+      "original_table_line_count": 7,
+      "export_table_line_count": 7
+    },
+    {
+      "id": "initial-rl",
+      "source": "claude_work/RESULTS_RL_20261025.md",
+      "original_heading_count": 6,
+      "export_heading_count": 6,
+      "original_table_line_count": 13,
+      "export_table_line_count": 13
+    },
+    {
+      "id": "aligned-depth",
+      "source": "results/ALIGNED_TEACHER_THREE_FULL_CHAIN_SUMMARY_20261025.md",
+      "original_heading_count": 5,
+      "export_heading_count": 5,
+      "original_table_line_count": 37,
+      "export_table_line_count": 37
+    },
+    {
+      "id": "first-baseline",
+      "source": "results/FIRST_FULL_BASELINE_STATUS_20261024.md",
+      "original_heading_count": 5,
+      "export_heading_count": 5,
+      "original_table_line_count": 17,
+      "export_table_line_count": 17
+    },
+    {
+      "id": "observation",
+      "source": "results/three_way_dynamic/REPORT.md",
+      "original_heading_count": 7,
+      "export_heading_count": 7,
+      "original_table_line_count": 34,
+      "export_table_line_count": 34
+    },
+    {
+      "id": "depth",
+      "source": "results/depth_control_comparison/REPORT.md",
+      "original_heading_count": 7,
+      "export_heading_count": 7,
+      "original_table_line_count": 27,
+      "export_table_line_count": 27
+    },
+    {
+      "id": "joint-translation",
+      "source": "results/joint_stage_comparison/REPORT.md",
+      "original_heading_count": 1,
+      "export_heading_count": 1,
+      "original_table_line_count": 35,
+      "export_table_line_count": 35
+    },
+    {
+      "id": "static",
+      "source": "results/static_stage_comparison/REPORT.md",
+      "original_heading_count": 1,
+      "export_heading_count": 1,
+      "original_table_line_count": 28,
+      "export_table_line_count": 28
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+
+.haco-page .site-header{max-width:1840px}
+.haco-page main{max-width:1840px}
+.haco-page strong{font-weight:650}
+.haco-intro{border:1px solid var(--line);border-radius:10px;margin:22px 0 4px;padding:25px 30px;display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,.9fr);gap:30px;background:var(--surface)}
+.haco-intro h2{font-size:clamp(22px,2.3vw,31px);margin:8px 0 14px;letter-spacing:-.025em}
+.haco-intro p{color:var(--muted);font-size:13px;line-height:1.85;margin-bottom:0}
+.haco-intro aside{background:var(--tint);border-left:3px solid var(--accent);padding:16px 21px}
+.haco-intro aside strong{font-size:14px}
+.haco-intro aside p{margin-top:9px;font-size:12px}
+.haco-load-status{color:var(--muted);font-size:11px}
+.haco-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:13px 15px;border:1px solid var(--line);border-radius:9px 9px 0 0;background:var(--surface)}
+.haco-toolbar label{display:flex;align-items:center;gap:7px;font-size:12px}
+.haco-toolbar select{max-width:258px;font-size:12px}
+.haco-toolbar input[type=range]{width:105px}
+.haco-toolbar output{color:var(--accent);font-variant-numeric:tabular-nums;min-width:39px}
+.haco-check{white-space:nowrap;cursor:pointer}
+.haco-check input{accent-color:var(--accent);margin-right:2px}
+.haco-framebar{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-top:0;border-radius:0 0 9px 9px;padding:12px 16px;background:var(--surface)}
+.haco-framebar input{flex:1;min-width:60px}
+.haco-framebar output{font:500 12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);min-width:140px;text-align:right}
+.haco-three-column{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:14px}
+.haco-frame-card{border:1px solid var(--line);background:var(--surface);min-width:0;overflow:hidden;border-radius:9px}
+.haco-frame-card header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line);min-height:63px}
+.haco-frame-card header b{display:block;font-size:13px}
+.haco-frame-card header small{display:block;font-size:10px;margin-top:3px}
+.haco-frame-card footer{color:var(--muted);font-size:10px;padding:10px 13px;line-height:1.6;min-height:60px}
+.haco-canvas{position:relative;aspect-ratio:16 / 9;background:#1f2528}
+.haco-canvas canvas{display:block;width:100%;height:100%}
+.haco-legend{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:13px 0 10px;color:var(--muted);font-size:11px}
+.haco-legend span{display:flex;align-items:center;gap:7px}
+.haco-dot{flex-shrink:0;display:inline-block;height:9px;width:9px;border-radius:50%}
+.haco-high{background:#fa892d}.haco-hit{background:transparent;border:2px solid #44d5a9}.haco-gt{background:transparent;border:2px solid #37bae9}
+.haco-frame-readout{padding:12px 16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12px;color:var(--muted);line-height:1.85}
+.haco-frame-readout strong{color:var(--ink)}
+.haco-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.haco-stat{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;min-height:132px}
+.haco-stat span{color:var(--muted);font-size:12px}
+.haco-stat strong{font-size:clamp(25px,2.6vw,36px);font-weight:550;letter-spacing:-.05em;color:var(--ink);margin:8px 0 1px}
+.haco-stat small{color:var(--muted);font-size:10px}
+.haco-stat.positive strong{color:var(--good)}.haco-stat.negative strong{color:var(--bad)}
+.haco-chart-panel{border:1px solid var(--line);background:var(--surface);border-radius:9px;margin-top:15px;padding:12px 17px 9px}
+.haco-chart-panel .panel-heading{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.haco-chart-panel h3{margin:5px 0}
+.haco-chart-panel .panel-heading span{font-size:11px;color:var(--muted)}
+#haco-chart{display:block;max-width:100%;width:100%;height:auto;overflow:visible;cursor:crosshair}
+.haco-chart-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:11px;padding:0 7px 10px}
+.haco-chart-legend span:last-child{margin-left:auto}
+.haco-line{width:23px;height:0;border-top:3px solid;display:inline-block;margin-left:9px}
+.haco-line.a2{color:#dcad63}.haco-line.a3{color:#4ac78f}.haco-line.gt{color:#43b6e0;border-top-style:dashed}
+.haco-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface);margin-top:15px}
+#haco-summary-table{border-collapse:collapse;width:100%;min-width:780px;font-size:12px}
+#haco-summary-table th,#haco-summary-table td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+#haco-summary-table th:first-child,#haco-summary-table td:first-child{text-align:left}
+#haco-summary-table th{background:var(--tint);color:var(--muted);font-size:11px}
+#haco-summary-table td{font-variant-numeric:tabular-nums}
+#haco-summary-table .positive{color:var(--good)}#haco-summary-table .negative{color:var(--bad)}
+.haco-interpretation{margin-top:15px;padding:19px 23px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:7px}
+.haco-interpretation strong{font-size:15px}.haco-interpretation p{font-size:12px;margin:7px 0 0;color:var(--muted);line-height:1.85}
+.haco-interpretation .haco-warning{color:var(--bad)}
+.haco-3d-layout{display:grid;grid-template-columns:minmax(0,2.3fr) minmax(260px,1fr);gap:15px;align-items:start}
+.haco-3d-panel,.haco-3d-side{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.haco-3d-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px}
+.haco-3d-top label{display:inline-flex;align-items:center;gap:7px}
+.haco-3d-top #haco-3d-reset{margin-left:auto}
+.haco-3d-view{position:relative;aspect-ratio:16/9;min-height:360px;overflow:hidden;background:#14201d}
+.haco-3d-view canvas{display:block;width:100%;height:100%;touch-action:pan-y}
+.haco-3d-hint{position:absolute;bottom:12px;right:16px;color:#bac8bbbd;pointer-events:none;font-size:10px;background:#05080888;padding:4px 8px}
+#haco-3d-status{position:absolute;left:14px;top:14px;color:#d4e2d0;background:#14201dc9;font-size:11px;padding:6px 9px;pointer-events:none}
+.haco-3d-foot{font-size:11px;color:var(--muted);line-height:1.75;padding:14px 18px;margin:0}
+.haco-3d-side{padding:24px}.haco-3d-side h3{font-size:17px}.haco-3d-side p{font-size:13px;color:var(--muted);line-height:1.8}
+.haco-3d-side a{display:block;border-top:1px solid var(--line);padding:9px 0;font-size:12px}
+.haco-method{padding-bottom:80px}
+.haco-scope-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.haco-scope-grid article{padding:24px;border:1px solid var(--line);border-radius:9px}
+.haco-scope-grid h3{font-size:16px}.haco-scope-grid p{font-size:12px;line-height:1.85;color:var(--muted);margin:0}
+.haco-scope-grid code{color:var(--accent);font-size:11px}
+.haco-page footer{max-width:1840px;padding:24px 30px;display:flex;gap:20px;align-items:center;justify-content:space-between;margin:auto;border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+@media(max-width:1250px){.haco-three-column{gap:7px}.haco-frame-card header{padding:10px}.haco-frame-card header b{font-size:12px}.haco-frame-card footer{padding:8px}.haco-stat{padding:15px}}
+@media(max-width:950px){.haco-three-column{grid-template-columns:1fr 1fr}.haco-frame-card:first-child{grid-column:span 2}.haco-3d-layout{grid-template-columns:1fr}.haco-summary-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.haco-intro{grid-template-columns:1fr;padding:17px;gap:12px}.haco-intro aside{padding:13px 14px}.haco-three-column{grid-template-columns:1fr}.haco-frame-card:first-child{grid-column:auto}.haco-toolbar{gap:9px}.haco-toolbar label{flex-wrap:wrap}.haco-framebar{flex-wrap:wrap}.haco-framebar input{order:5;flex-basis:100%;margin:8px 0}.haco-framebar output{margin-left:auto}.haco-summary-grid{gap:7px}.haco-stat{padding:12px}.haco-stat strong{font-size:25px}.haco-3d-view{min-height:270px}.haco-3d-top{gap:8px}.haco-scope-grid{grid-template-columns:1fr}.haco-page footer{flex-direction:column;align-items:start}.haco-chart-panel .panel-heading{flex-wrap:wrap}.haco-chart-legend span:last-child{margin-left:0}}
+
+/* Responsive contact 3D column: prevent min-content expansion on narrow screens. */
+.haco-3d-panel,.haco-3d-side,.haco-3d-view{min-width:0;max-width:100%}
+.haco-3d-top{min-width:0;max-width:100%}
+.haco-3d-side{overflow-wrap:anywhere}
+@media(max-width:950px){.haco-3d-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:620px){.haco-3d-top label{min-width:0;flex-wrap:wrap}.haco-3d-top select{min-width:0;max-width:100%}}

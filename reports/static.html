@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>早期静止段约束 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="static.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">历史探索</span> · 来源 <code>results/static_stage_comparison/REPORT.md</code><p>静止约束消除假平移，同时损失投影覆盖，按原门槛拒绝候选。</p></div><details class="toc"><summary>本页目录</summary></details><h1 id="section-0">Box 静止段平移一致性：终点锚定消融</h1>
+<p>TS 消除了前段约 10cm 的假平移，静止段 GT 速度误差从 186.08 降至 7.02mm/s；同时丢失了 32 个源像素的 mesh 支持，轮廓 IoU 下降。预先规定的非 GT 验收失败，选择已锁定为 <code>none_keep_M</code>，保留 M 作为诊断起点。</p>
+<p>本轮只修改 source frame0–22，frame23 作为固定终点；frame23 及之后、全部手、旋转、尺度、mesh 和 K 保持 M。T0/TS 使用相同变量与预算，TS 增加静止一致性项。静止段按 frame0–23、pair0→1 至22→23评分；旧 holdout 的准确名称为“未参与梯度的留出诊断”，其全点统计已参与方案形成。</p>
+<p>冻结训练侧静止证据由 assets 核验：每 pair79–80 个旧训练 RGB 对应，median 最大0.03171px，P90最大0.13993px；mask u/v 范围0.21036/0.20582px，面积幅度0.7023%。本评价复用 <code>results/static_training_evidence/receipt.json</code>，没有重新选择区间。</p>
+<div class="table-wrap"><table><thead><tr><th>静止段非 GT 指标</th><th>M</th><th>T0</th><th>TS</th></tr></thead><tbody>
+<tr><td>z max−min (mm)</td><td>105.011</td><td>102.937</td><td>0.0646651</td></tr>
+<tr><td>累计绝对 z 变化 (mm)</td><td>136.078</td><td>126.859</td><td>0.0827669</td></tr>
+<tr><td>centroid 速度均值 (mm/s)</td><td>186.222</td><td>171.961</td><td>0.237284</td></tr>
+<tr><td>centroid 速度 P95 (mm/s)</td><td>406.093</td><td>366.501</td><td>0.388156</td></tr>
+<tr><td>原冻结材料点 EPE (px)</td><td>0.42472</td><td>0.372511</td><td>0.229472</td></tr>
+<tr><td>当前 mesh 重求交 EPE，miss20px (px)</td><td>0.419755</td><td>0.365263</td><td>1.83927</td></tr>
+<tr><td>重求交支持 / 原静止分母</td><td>354 / 354</td><td>354 / 354</td><td>322 / 354</td></tr>
+<tr><td>静止段 mask IoU</td><td>0.7852</td><td>0.790897</td><td>0.712687</td></tr>
+<tr><td>末三 pair 最大速度 (mm/s)</td><td>341.792</td><td>236.83</td><td>0.411256</td></tr>
+</tbody></table></div>
+<p>TS 的 z 幅度和累计变化均降至 M 的 0.062% 左右；末三 pair 最大速度0.411mm/s，低于预设上限341.792mm/s。修改帧的独立双向穿透全为0；assets 目视16/18/20/22/23/24帧，相对M无新增明显可见手指遮挡。</p>
+<p>失败项集中在投影支持和轮廓：重求交 EPE 为 T0 的5.035倍，支持由354降至322，IoU 相对M/T0下降0.07251/0.07821。32个新miss集中于pair0–11和13；miss按20px保留原分母。成功命中点的次要诊断EPE为0.22101px（T0 0.36526px），说明静止运动残差改善与投影覆盖丢失同时存在。正式gate仍使用含miss的完整分母。</p>
+<p>在固定frame23锚、旋转和尺度的条件下，静止平移与前段投影覆盖不相容。运动改善和轮廓失败在结果中分别保留。</p>
+<div class="table-wrap"><table><thead><tr><th>末端 pair</th><th>M速度 / recast EPE</th><th>T0速度 / recast EPE</th><th>TS速度 / recast EPE</th></tr></thead><tbody>
+<tr><td>20→21</td><td>75.500 mm/s / 0.1930px</td><td>78.154 mm/s / 0.3092px</td><td>0.173 mm/s / 0.1410px</td></tr>
+<tr><td>21→22</td><td>265.280 mm/s / 0.5110px</td><td>172.102 mm/s / 0.4054px</td><td>0.308 mm/s / 0.2811px</td></tr>
+<tr><td>22→23</td><td>341.792 mm/s / 0.7469px</td><td>236.830 mm/s / 0.5343px</td><td>0.411 mm/s / 0.3625px</td></tr>
+<tr><td>23→24</td><td>400.388 mm/s / 0.9755px</td><td>400.388 mm/s / 0.9755px</td><td>400.388 mm/s / 0.9755px</td></tr>
+</tbody></table></div>
+<p>23→24 及后续每一对的 object_T、centroid 位移和速度逐值保持 M。原23→24的400.388mm/s延续速度完整保留，末端修正没有向后段插值。frame23后的既有碰撞和遮挡错误也随M保留。</p>
+<p>非 GT 加视觉gate于 2026-10-20T18:58:55.790770+00:00 完整落盘，选择 <code>none_keep_M</code>；随后才统一读取未滤 GT，三组使用既有 Raw 固定 canonical offset：</p>
+<div class="table-wrap"><table><thead><tr><th>GT 指标</th><th>M</th><th>T0</th><th>TS</th></tr></thead><tbody>
+<tr><td>全序列物体位置误差 (mm)</td><td>53.1429</td><td>52.9475</td><td>56.6883</td></tr>
+<tr><td>全序列物体速度向量误差 (mm/s)</td><td>210.115</td><td>205.625</td><td>153.698</td></tr>
+<tr><td>全序列物体速度向量误差 P95 (mm/s)</td><td>499.087</td><td>499.087</td><td>499.087</td></tr>
+<tr><td>全序列手物相对关节位置误差 (mm)</td><td>56.825</td><td>55.999</td><td>69.295</td></tr>
+<tr><td>全序列手物相对关节速度误差 (mm/s)</td><td>214.296</td><td>216.453</td><td>234.406</td></tr>
+<tr><td>静止0–23物体位置误差 (mm)</td><td>41.9419</td><td>41.3393</td><td>52.8735</td></tr>
+<tr><td>静止0–23物体速度向量误差 (mm/s)</td><td>186.081</td><td>171.831</td><td>7.01931</td></tr>
+<tr><td>后段23–73物体位置误差 (mm)</td><td>58.4126</td><td>58.4126</td><td>58.4126</td></tr>
+<tr><td>后段23–73物体速度向量误差 (mm/s)</td><td>221.17</td><td>221.17</td><td>221.17</td></tr>
+</tbody></table></div>
+<p>TS 的全序列速度误差降至153.698mm/s；固定锚造成静止段位置误差升至52.873mm，相对手物误差也增加。全段速度误差P95保持499.087mm/s，来自未改后段。GT揭示保持原失败选择。</p>
+<p>图：静止段动作、观测与穿透（来源：<code>results/static_stage_comparison/static_stage_overview.png</code>）</p>
+<p>左上紫色TS几乎水平，靠近固定frame23约832mm，GT深度约783mm。右上早期重求交峰值与左下轮廓退化集中在原盒子投影较大的前段。两张穿透图为0，虚线标记3mm阈值。</p>
+<p>图：末端与接续（来源：<code>results/static_stage_comparison/static_stage_endpoint.png</code>）</p>
+<p>TS在20→21、21→22、22→23保持接近静止，到了23→24立即与M重合。右图末端留出EPE继续改善，前段覆盖丢失仍在全静止评分中保留。</p>
+<p>执行与证据：</p>
+<ul>
+<li>T0 200attempt、49接受（39全步/10回溯）、151拒步，51.868s；TS 200attempt、200接受（178全步/22回溯）、0拒步，32.410s。两条正式终态exit0，无修正触界或碰撞拒proposal。</li>
+<li>所有固定数组、仅frame0–22平移和100mm范围检查通过；后段位置/位移/速度逐值M。</li>
+<li>独立碰撞2048表面样本使用seed20261021，区别于训练seed20261022；完整距离保存于<code>dense_penetration_per_query.npz</code>。</li>
+<li><code>non_gt_metrics.json</code>及<code>non_gt_static_metrics.csv</code>保留静止分母与逐帧穿透；<code>endpoint_pairs.csv</code>保留20→21到23→24逐pair；<code>recast_support_diagnostic.json</code>保留miss来源。</li>
+<li><code>gate_selection.json</code>保留GT前数值与视觉证据；<code>GT_metrics.json</code>保留全段、静止及后段完整动态评分；<code>all_metrics.csv</code>为全段完整表。新增4项自检通过。</li>
+</ul>
+<p>本轮结论：明确的RGB静止证据能帮助消除时变深度误差；当前终点锚定平移方案与前段投影覆盖存在冲突，按冻结规则保留失败证据并继续诊断。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

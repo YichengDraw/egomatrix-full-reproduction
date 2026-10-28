@@ -1,0 +1,43 @@
+{
+  "schema": "egomatrix-physical-full-demo-videos-20261028",
+  "scope": "actual recorded epoch900 physical simulation; main native SVOR plus cut and brush source-camera replay",
+  "tasks": {
+    "main": {
+      "frames": 249,
+      "fps": 30,
+      "actual_control_steps": 497,
+      "full_task_success": false,
+      "video": "media/main_robot_composite.mp4",
+      "sha256": "72a37cf663e0dd109299f565558a2961ace6f7a2f1aee5b4505ac51affd2eaf2",
+      "background_technique": "SVOR-generated de-personed scene composite",
+      "physics_reintegrated_for_video": false,
+      "inference_gt_used": false
+    },
+    "cut": {
+      "frames": 200,
+      "fps": 30,
+      "actual_control_steps": 399,
+      "full_task_success": false,
+      "video": "media/cut_robot_composite.mp4",
+      "sha256": "55bac625700040a38d944a060f0daa1df184eb75f4ee4f3280bbeea3fa3a6dd8",
+      "background_technique": "native state source-camera render with original RGB inset; NO SVOR",
+      "physics_reintegrated_for_video": false,
+      "inference_gt_used": false,
+      "source_trace_sha256": "70f12e5a3df6b973cc73f955513a9ece2d806edd6fb8b8d7ea2e52e7c85b9c08",
+      "state_mapping": "physics_pre source frame i → native physics frame 4*i (120Hz/30Hz)"
+    },
+    "brush": {
+      "frames": 209,
+      "fps": 30,
+      "actual_control_steps": 417,
+      "full_task_success": false,
+      "video": "media/brush_robot_composite.mp4",
+      "sha256": "4861d63d3ba25d02ee19be49170f109ebf6b1c547e28005e18fb967c11814672",
+      "background_technique": "native state source-camera render with original RGB inset; NO SVOR",
+      "physics_reintegrated_for_video": false,
+      "inference_gt_used": false,
+      "source_trace_sha256": "1aa741d0912cf34fce8093d187bf954aa944c331088540b3aee1bf8dfdd8af77",
+      "state_mapping": "physics_pre source frame i → native physics frame 4*i (120Hz/30Hz)"
+    }
+  }
+}

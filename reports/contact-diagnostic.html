@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>手与物体到底有多远 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="contact-diagnostic.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">接触诊断</span> · 来源 <code>claude_work/phase2/p1/REPORT.md</code><p>真实表面距离、全手接触力与传感器正控制，定位抓持形成问题。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">力传感器核查</a><a href="#section-2">结论</a><a href="#section-3">掌区点距离补表</a></details><h1 id="section-0">P1 接触几何与力传感器诊断</h1>
+<p>使用 T2 selected bidirectional task0-0 全 497 帧；接触区间按公开 loader 的 <code>tips_distance &lt; 5 mm</code>，独立 GT 未读取。以下有符号距离直接计算到重建对象三角网表面，正值为外侧间隙、负值为进入网格。</p>
+<div class="table-wrap"><table><thead><tr><th>手</th><th>指</th><th>接触帧</th><th>MANO 中位 mm</th><th>FK 中位 mm</th><th>零残差实际中位 mm</th><th>原tip传感器峰值 N</th></tr></thead><tbody>
+<tr><td>rh</td><td>thumb</td><td>276</td><td>1.34</td><td>1.73</td><td>97.33</td><td>0.00</td></tr>
+<tr><td>rh</td><td>index</td><td>87</td><td>1.23</td><td>0.91</td><td>122.78</td><td>0.00</td></tr>
+<tr><td>rh</td><td>middle</td><td>58</td><td>1.92</td><td>8.71</td><td>82.61</td><td>3.04</td></tr>
+<tr><td>rh</td><td>ring</td><td>21</td><td>1.94</td><td>4.59</td><td>24.28</td><td>1.46</td></tr>
+<tr><td>rh</td><td>pinky</td><td>15</td><td>1.00</td><td>9.23</td><td>66.13</td><td>0.00</td></tr>
+<tr><td>lh</td><td>thumb</td><td>16</td><td>3.69</td><td>3.65</td><td>41.84</td><td>0.00</td></tr>
+<tr><td>lh</td><td>index</td><td>46</td><td>0.72</td><td>0.66</td><td>18.70</td><td>1.48</td></tr>
+<tr><td>lh</td><td>middle</td><td>25</td><td>1.16</td><td>4.02</td><td>28.81</td><td>0.00</td></tr>
+<tr><td>lh</td><td>ring</td><td>2</td><td>2.68</td><td>2.82</td><td>33.41</td><td>3.05</td></tr>
+</tbody></table></div>
+<p>MANO 掌心采用腕和四指近端关节的平均位置，定义及全序列结果位于 <code>geometry_summary.json</code>。实际掌部使用刚体 hand_link 原点，点位置与皮肤表面距离的区别已在原始字段中保留。</p>
+<h2 id="section-1">力传感器核查</h2>
+<ul>
+<li>rh：真实全 link 对象过滤力峰值 6.220 N，有力 &gt;0.1N 的控制帧 40/497；独立正接触校准峰值 2.977 N，原 tip 通道峰值 0.000 N。</li>
+<li>lh：真实全 link 对象过滤力峰值 5.688 N，有力 &gt;0.1N 的控制帧 124/497；独立正接触校准峰值 7.677 N，原 tip 通道峰值 3.475 N。</li>
+</ul>
+<p>正接触校准把同一物体临时放到对应食指 distal 碰撞 link 内，运行 24 个 1/120s 子步。该分支仅校准读数，未进入 reference、训练或评分。各 body 的真实接触力见 <code>sim_summary.json</code>；USD 原始 prim 清单遗漏 instance proxies，其空项仅保留为诊断历史。</p>
+<p>原始数据：<code>contact_geometry_all.npz</code>、<code>all_body_object_forces.npz</code>、<code>positive_control_forces.npz</code>、<code>trace/</code>。曲线：<code>contact_geometry_curves.png</code>。</p>
+<h2 id="section-2">结论</h2>
+<p>重建在接触帧的 MANO 点中位距离约 0.7–3.7 mm；接触感知 retarget 分支有依据：右中指/小指 FK 中位间隙 8.71/9.23 mm，左中指 4.02 mm。先执行上游量级驱动 A，并测试通用接触分支 B。</p>
+<p>同一时间、同一 tip body 的 direct PhysX 对象过滤读数与原传感器完全一致，两手最大差均 0 N。两手前 30 步 tip 峰值均 0 N。原传感器工作正常；实体 distal link 的接触应在诊断中另行报告。完整 rollout 中右中/无名、左食/无名 tip 均出现非零力，进一步完成了两侧真实接触读数核验。</p>
+<p>右手接触区间至少一指接触共 320 帧，首/末 23/403；左手共 85 帧，首/末 43/306。训练第 30 步结束使左手还未进入其接触段，右手刚进入。满程后实际对象的垂直位移右 -0.20 mm、左 -0.03 mm，物体仍在桌面附近。实际手与对象的间隙随参考抬起扩大，说明少量瞬时触碰尚未形成持物。</p>
+<p>对象三角网均 winding consistent（面法向一致）且存在孔洞。距离幅值为真实三角面最近距离；内外符号使用 trimesh 最近表面法向与包含测试。接触区间的毫米级局部间隙可供 B 选择依据；深部负距离的内外解释受孔洞影响。</p>
+<p><code>contact_interval_geometry.png</code> 只画源接触帧，便于比较 MANO/FK 的间隙；<code>contact_geometry_curves.png</code> 展示整个序列与实际物体状态，均已实际查看。独立 GT 未读取。</p>
+<h2 id="section-3">掌区点距离补表</h2>
+<p>复用原逐帧距离，取该手至少一指接触的帧。掌心点为腕与四指近端关节均值；腕代理和实际hand_link原点单列。各点到物体表面的有符号距离中位如下，单位mm。掌区点描述位置，接触修复依据使用指尖和实体指腹。</p>
+<div class="table-wrap"><table><thead><tr><th>手</th><th>接触帧</th><th>MANO掌心点</th><th>FK掌心点</th><th>MANO腕代理</th><th>FK腕代理</th><th>实际hand_link原点</th></tr></thead><tbody>
+<tr><td>rh</td><td>320</td><td>47.82</td><td>64.10</td><td>100.48</td><td>111.82</td><td>165.06</td></tr>
+<tr><td>lh</td><td>85</td><td>43.67</td><td>69.09</td><td>103.19</td><td>128.47</td><td>148.99</td></tr>
+</tbody></table></div>
+<p>原始数组与点定义保留于contact_geometry_all.npz；本表汇总见palm_point_summary.json。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

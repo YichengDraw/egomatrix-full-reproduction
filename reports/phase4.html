@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第四阶段最终结果 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="phase4.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">最终对照</span> · 来源 <code>claude_work/RESULTS_PHASE4_20261026.md</code><p>FoundationPose有限对照、刷子控制消融、跨任务采用决定与最终交付。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">R1：漂移起点</a><a href="#section-2">R2：已执行的通用对照与停止依据</a><a href="#section-3">R3：brush持物改善与统一采用决定</a><a href="#section-4">R4：最终交付与核算</a></details><h1 id="section-0">EgoMatrix 第四阶段：最终结果</h1>
+<p>本阶段按简报完成R1、有限通用A1对照、R3控制对照和R4交付。重建分支触发“现有FP/观测能力仍有大幅旋转误差”的停止条件，未运行新后级。最终统一配置与权重沿用阶段二C3，论文成功数保持 <strong>0/3</strong>，原RGB覆盖249/249、200/200、209/209。</p>
+<p>整个复现的负责人报告为 <a href="final.html">FINAL_REPRODUCTION_REPORT.md</a>，包含完整流程、逐阶段忠实度、关键文件/开关、Table1/2对比、重建十项指标与真实rollout四项指标。</p>
+<h2 id="section-1">R1：漂移起点</h2>
+<p>四对象六层评分使用原论文scorer。主例碗024、勺032与cut刀122在A1就已失败；cut板049各级通过。碗全程无严重遮挡仍累积至近π；两件工具首次超过1rad均早于首个严重遮挡帧。全姿态FP细化形成偏差，后续仅平移分支保留已有朝向。</p>
+<p>898帧原FP分支记录包含每帧选中假设、完整score、遮挡比例与细化旋转。相机/ST坐标组成正确，候选valid均存在；5次注册与2次跟踪细化已与官方FP默认一致。</p>
+<h2 id="section-2">R2：已执行的通用对照与停止依据</h2>
+<p>规则均在GT评分前冻结。新增开关默认关闭，旧行为保留：</p>
+<ul>
+<li><code>--tracking-variant upstream-augmented</code>：增加官方tracking的上一帧相机姿态种子，普通帧使用一次原生2轮细化，完整组共同评分。</li>
+<li><code>--occlusion-evidence hand-only</code>配显式手mask：只用双手触发严重手遮挡，修正原列表还并入另一对象mask的证据范围。</li>
+<li>隔离GT mesh诊断：四对象从首帧注册完整跑A1，GT位姿不进入推理，不用于选型。</li>
+</ul>
+<div class="table-wrap"><table><thead><tr><th>对象</th><th>原A1 ARE / 最大ARE rad</th><th>GT mesh诊断</th><th>官方候选</th><th>仅手遮挡</th></tr></thead><tbody>
+<tr><td>主024</td><td>1.4673 / 3.0560</td><td>1.0738 / 2.9853</td><td>1.4719 / 3.0602</td><td>1.4665 / 3.0541</td></tr>
+<tr><td>主032</td><td>1.4123 / 2.4980</td><td>0.4627 / 2.1591</td><td>1.4205 / 2.4748</td><td>1.2078 / 2.8545</td></tr>
+<tr><td>cut049</td><td>0.0289 / 0.0608</td><td>0.0254 / 0.0821</td><td>0.0288 / 0.0608</td><td>0.0289 / 0.0604</td></tr>
+<tr><td>cut122</td><td>1.3010 / 1.7907</td><td>1.6536 / 2.8063</td><td>0.6242 / 1.5494</td><td>1.5453 / 3.1294</td></tr>
+</tbody></table></div>
+<p>各组均仅049通过完整判据。仅手遮挡将主勺/刀最长锁转100/99帧降至0/4帧，持续旋转误差仍存在。GT mesh改善碗和勺的均值，刀变差；几何替换同时影响外观表达，未证实mesh是单独主因。</p>
+<p>12次完整A1运行全部exit0。按简报能力边界停止；新Scene/A2/A3、retarget和RL未启动，隔离namespace保留为CPU准备状态。报告与十张实查图见 <a href="tracking-origin.html">R1报告</a>，论文/官方代码对照见 <a href="tracking-fidelity.html">R2审查</a>。</p>
+<h2 id="section-3">R3：brush持物改善与统一采用决定</h2>
+<p>比较残差0.5、2及末指节全碰撞净力，三项brush均执行至1200轮；残差2再同参数验证main/cut至900轮。</p>
+<div class="table-wrap"><table><thead><tr><th>brush配置</th><th>所选轮数</th><th>双侧参考位置误差mm</th><th>右高抬区实际均高mm</th><th>半参考高度占比</th></tr></thead><tbody>
+<tr><td>原C3，残差1</td><td>900</td><td>56.25</td><td>0.02</td><td>0%</td></tr>
+<tr><td>残差0.5</td><td>1200</td><td>59.93</td><td>0.08</td><td>0%</td></tr>
+<tr><td>残差2</td><td>1200</td><td>31.55</td><td>79.76</td><td>95%</td></tr>
+<tr><td>末指节全碰撞净力</td><td>900</td><td>60.19</td><td>0.01</td><td>0%</td></tr>
+</tbody></table></div>
+<p>残差2形成持续抬起。主例同配置的位置误差41.74→49.84mm、持续抬高79.40→68.06mm，超过训练前固定的2mm退化门槛；cut同门槛通过。因此GT-free冻结保留统一C3。</p>
+<p>冻结后GT：残差2 brush左/右最大平移56.98/58.38mm，最大旋转0.67365/1.23983rad，右刷仍越过1rad。主例/cut候选也失败。最终统一权重未变，无新成功任务。</p>
+<p>全部13阶段真实训练、曲线、完整轨迹与评分已保存；三项对照图、brush参考跟随图和GT误差图已实际查看。详见 <a href="control-ablation.html">R3报告</a> 与 <code>phase4/r3/FINAL_SELECTION_FROZEN.json</code>。</p>
+<h2 id="section-4">R4：最终交付与核算</h2>
+<ul>
+<li><a href="final.html">整个复现最终报告</a>。</li>
+<li>统一结果与论文对比数据（来源：<code>claude_work/phase4/r4/FROZEN_BASELINE_METRICS.json</code>）。</li>
+<li>阶段终态摘要（来源：<code>claude_work/phase4/FINAL_PHASE4_SUMMARY.json</code>）。</li>
+<li>主例完整合成视频（来源：<code>claude_work/phase2/p3/final_main900_video/video/composite.mp4</code>）：249帧、30fps、720p、8.3秒，沿用原完整解码证据与同一真实轨迹。</li>
+</ul>
+<p>本轮训练15765秒=4.379小时；FP进程913.31秒=.254小时，记录的训练/FP时间合计4.633小时，短评估与导出另计，预算未超过12小时。并行预计算已独立计入一次；顺序controller漏计字段的更正在 <code>phase4/r3/TRAINING_ACCOUNTING.json</code>。</p>
+<p>最终报告明确保留：三任务原Scene采用raw depth而论文要求aligned depth；cut原A3 touch预处理实际移动左板/手，main/brush两prepass关闭；B接触目标、前馈与C3额外控制属于授权扩展。当前证据范围是三段工程复现。</p>
+<p>本地及远端SSD任务根同名目录已同步；权重和新增FP原始candidate traces留远端。全部本轮训练与FP计算已结束。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>

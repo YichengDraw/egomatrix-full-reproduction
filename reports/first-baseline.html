@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>首轮完整重建与API基线 · EgoMatrix 复现报告</title><style>html{color-scheme:light}body{margin:0;background:#faf9f6;color:#242424;font:16px/1.8 system-ui,-apple-system,"Noto Sans CJK SC",sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px 80px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;border-bottom:1px solid #dcd8cf;padding-bottom:16px}a{color:#315c83;text-underline-offset:3px}h1{font-size:30px;line-height:1.4;margin-top:30px}h2{font-size:23px;margin-top:40px}h3{font-size:19px;margin-top:30px}p{margin:16px 0}code{font:13px/1.7 ui-monospace,SFMono-Regular,monospace;background:#efede7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#efede7;padding:16px;overflow:auto;border-radius:7px}pre code{padding:0;white-space:pre}.table-wrap{overflow:auto;margin:20px 0}table{border-collapse:collapse;min-width:660px;font-size:14px;width:100%}th,td{text-align:left;padding:10px 12px;border:1px solid #d9d6cd;vertical-align:top}th{background:#eeeae1;white-space:nowrap}blockquote{margin:20px 0;border-left:3px solid #aaa;padding-left:18px;color:#555}.meta{font-size:14px;color:#666;margin:20px 0}.toc{background:#f1eee7;border:1px solid #ded9ce;padding:14px 20px;border-radius:6px}.toc a{display:block;font-size:14px}.badge{font-size:12px;color:#78613d}.cards{display:grid;gap:14px}.card{border:1px solid #d9d6cd;background:white;border-radius:7px;padding:18px}.card h2{margin:0;font-size:20px}.card p{margin:8px 0}.math-source{white-space:pre-wrap}footer{border-top:1px solid #ddd;margin-top:40px;padding-top:16px;font-size:13px;color:#777}@media(max-width:650px){main{padding:18px 14px 50px}h1{font-size:25px}table{font-size:13px}}</style><link rel="stylesheet" href="../report-theme.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("egomatrix-theme")||"dark"}catch{}</script></head><body><button id="report-theme" aria-label="切换到日间模式" title="切换到日间模式">☾</button><main><nav><a href="../index.html">← 返回同步展示</a><a href="index.html">报告目录</a><a href="first-baseline.md" download>下载 Markdown</a></nav><div class="meta"><span class="badge">历史基线</span> · 来源 <code>results/FIRST_FULL_BASELINE_STATUS_20261024.md</code><p>A1至A3、真实消费参考、原核审计和最初9步API失败。</p></div><details class="toc"><summary>本页目录</summary><a href="#section-1">完整重建：动态、穿透与物理结果</a><a href="#section-2">原核安全审计</a><a href="#section-3">实际参考与一次更新API</a><a href="#section-4">结果入口与后续问题</a></details><h1 id="section-0">首轮完整 baseline：2026-10-24</h1>
+<p>完整重建与三个一次更新API已齐。三个有可靠官方标注对应的样本分别完成249、200、209个原帧的A1→Scene→A2→最终候选阶段；260帧原刷洗样本完成全片视觉与预测物理评价。论文忠实性、视觉质量和完整policy任务成功仍待解决。</p>
+<h2 id="section-1">完整重建：动态、穿透与物理结果</h2>
+<p>腕物相对速度误差指物体中心相对手腕的速度误差。Dpen为预先绑定手—物对的逐帧最大手顶点穿透深度均值；SD为固定手条件下物体自由物理仿真的位移。三项均越小越好。</p>
+<div class="table-wrap"><table><thead><tr><th>完整原序列</th><th>帧/相邻对</th><th>腕物相对速度误差 A1→最终候选 mm/s</th><th>Dpen A1→A2→最终候选 mm</th><th>SD A1→最终候选 mm</th></tr></thead><tbody>
+<tr><td>TACO bowl/ladle，20231105_019</td><td>249/248</td><td>360.878→242.448</td><td>0.699→0.306→1.184</td><td>96.780→83.515</td></tr>
+<tr><td>TACO cut，20230926_037</td><td>200/199</td><td>295.811→212.841</td><td>4.426→0.220→1.362</td><td>82.838→71.471</td></tr>
+<tr><td>TACO brush，20230927_027</td><td>209/208</td><td>393.941→199.590</td><td>1.551→0.470→1.062</td><td>83.299→63.817</td></tr>
+<tr><td>原brush，20230919_036，仅视觉/物理</td><td>260帧</td><td>N/A</td><td>0.662→0.826→1.329</td><td>91.745→55.439</td></tr>
+</tbody></table></div>
+<p>三个可GT评分样本的腕物相对运动误差均低于A1，四个样本的A2→最终候选Dpen均增加。原260 RGB与262行标注缺可靠逐帧映射，保持完整输入和视觉/物理范围。多手SD与allhands Dpen作为补充列，主列沿预先绑定手—物对；作者scorer的手集合解释仍待确认。</p>
+<p>只有cut实际启用了额外全帧touch-table support：切板平均移动16.148mm、平均旋转2.792°，并刚体带动左手，物体轨迹收益归此预处理。该阶段标为“Grounding＋A3（候选实现）”。其余三段support未启用，四段object-collision prepass均未启用，物体轨迹保持保存精度内不变。论文A.1 grounding限定非接触物体且手不变，A.3固定物体轨迹；本轮候选链据实际配置分段披露。</p>
+<h2 id="section-2">原核安全审计</h2>
+<p>全部端点与相邻边保存原核双向几何；原规则仅判定task-only与接触边界子集。contact-contact原判定N/A单列。signed为原核双向最小有符号距离，负值表示穿透；原接触包络可有负接受下限。</p>
+<div class="table-wrap"><table><thead><tr><th>样本</th><th>全部端点/侧边</th><th>原适用边</th><th>其中失败</th><th>N/A边</th><th>原适用集合最深bound signed/limit mm</th><th>全片最深bound signed mm</th></tr></thead><tbody>
+<tr><td>bowl/ladle249</td><td>498/496</td><td>164</td><td>1</td><td>332</td><td>−7.067/−6.865，fail</td><td>−8.729，N/A</td></tr>
+<tr><td>cut200</td><td>400/398</td><td>11</td><td>10</td><td>387</td><td>−7.867/−7.045，fail</td><td>−10.140，N/A</td></tr>
+<tr><td>brush209</td><td>418/416</td><td>170</td><td>0</td><td>246</td><td>−7.286/−7.532，pass</td><td>−9.283，N/A</td></tr>
+<tr><td>原brush260</td><td>520/518</td><td>60</td><td>4</td><td>458</td><td>−6.034/−6.352，pass</td><td>−18.158，N/A</td></tr>
+</tbody></table></div>
+<p>brush209最深原适用非绑定物体signed为+90.418mm/limit0，全片非绑定最小为+29.456mm/N/A；最深端点双向signed−8.831mm、端点判定N/A。old260四条失败为LH23与RH21/27/234，各signed/limit及最深端点−14.660mm/N/A见专页。cut的10条失败含1条绑定刀穿透失败和10条非绑定切板障碍失败；主249的唯一失败为RH11→12。上述原适用通过率与完整几何穿透分别记录。</p>
+<h2 id="section-3">实际参考与一次更新API</h2>
+<p>实际loader参考分别完整保留497、399、417个60Hz帧，精确even映射原249、200、209时刻；消费参考的物体轨迹/表面物理评分已齐。smoothed778缺native MANO FK，RA、CD_h与官方腕物相对速度为N/A。</p>
+<div class="table-wrap"><table><thead><tr><th>独立API任务</th><th>一次更新episode</th><th>实际参考覆盖</th><th>原帧/独立GT覆盖</th><th>终态</th></tr></thead><tbody>
+<tr><td>bowl/ladle task0-0</td><td>9控制步/0.15s</td><td>9/497</td><td>5/249</td><td>拇指、食指、中指、小指失败</td></tr>
+<tr><td>cut task0-1</td><td>9控制步/0.15s</td><td>9/399</td><td>5/200</td><td>拇指、食指、中指失败</td></tr>
+<tr><td>brush task0-2</td><td>9控制步/0.15s</td><td>9/417</td><td>5/209</td><td>拇指、食指、中指失败</td></tr>
+</tbody></table></div>
+<p>每个API均8环境、seed0、1个PPO epoch，完整retarget预算沿冻结配置执行。actual consumed tracking、retarget FK→MANO固有差异、仿真→FK执行差异和独立GT任务transfer分别留档。三个短episode的完整任务判定均失败。主formal按原1024环境、最大10000 epoch配置继续，下一固定验收为原生epoch2000/10月25日03:00节点，沿22:42阶段记录与既有事件接续。</p>
+<h2 id="section-4">结果入口与后续问题</h2>
+<ul>
+<li>249帧候选A3与原核审计（来源：<code>results/APPENDIX_C_A3_SUMMARY.md</code>）、实际参考与主API（来源：<code>results/APPENDIX_C_A3_SMOOTHED_AND_API_SUMMARY.md</code>）</li>
+<li>cut候选阶段及额外grounding归因（来源：<code>results/APPENDIX_C_ELIGIBLE_CUT_A3_SUMMARY.md</code>）、cut消费参考与API（来源：<code>results/APPENDIX_C_ELIGIBLE_CUT_CONSUMED_AND_API_SUMMARY.md</code>）</li>
+<li>brush209完整阶段与审计（来源：<code>results/APPENDIX_C_BRUSH209_A3_SUMMARY.md</code>）、brush消费参考与API（来源：<code>results/APPENDIX_C_BRUSH209_CONSUMED_AND_API_SUMMARY.md</code>）</li>
+<li>原brush260视觉/物理范围与审计（来源：<code>results/APPENDIX_C_BRUSH260_A3_SUMMARY.md</code>）</li>
+</ul>
+<p>绝对姿态与外观差距仍明显：主249物体旋转误差ARE为1.410rad，末段勺方向偏差已在f186/248实际查看；cut的刀/手腕，以及两段brush的指形和刷体轮廓仍有可见偏差。已有同帧五帧图分别见主249（来源：<code>results/frontdepth_overlay/official_taco_development/A1_Scene_A2_A3_comparison/rgb_frontdepth_comparison_5frames.jpg</code>）、cut200（来源：<code>results/frontdepth_overlay/paper_taco_cut_eligible_validation/A1_Scene_A2_A3_comparison/rgb_frontdepth_comparison_5frames.jpg</code>）、brush209（来源：<code>results/frontdepth_overlay/paper_taco_brush_eligible_development/A1_Scene_A2_A3_comparison/rgb_frontdepth_comparison_5frames.jpg</code>）、原brush260（来源：<code>results/frontdepth_overlay/paper_taco_brush_development/A1_Scene_A2_A3_comparison/rgb_frontdepth_comparison_5frames.jpg</code>）。这些视觉证据与相对运动指标共同决定后续改进方向。</p>
+<p>后续重点是论文允许的处理边界、完整视频中的手物对齐/穿透，以及足额策略对完整任务的执行。小样本完整baseline提供逐段证据，论文aggregate实验与作者展示的视觉、动态效果仍是待达到的目标。本页汇总已冻结结果，沿既定节点推进主formal；当前没有新增修复实验或候选优化。</p><footer>EgoMatrix 复现证据归档 · 2026-10-26。原报告的结论、方法差异和评价分母保持；运行位置与未发布文件显示为来源文字。</footer></main><script src="../theme.js"></script></body></html>
