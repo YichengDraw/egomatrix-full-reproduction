@@ -1,0 +1,146 @@
+{
+  "schema": "EgoMatrix-hd-stage-crops-20261029",
+  "origin": "existing frozen A1-Scene-A2-A3 five-panel recorded videos",
+  "original_five_panel_width": 4800,
+  "original_height": 580,
+  "original_panel_width": 960,
+  "original_panel_indices": {
+    "A1": 1,
+    "Scene": 2,
+    "A2": 3,
+    "A3": 4
+  },
+  "encoding": {
+    "codec": "h264",
+    "preset": "veryfast",
+    "crf": 17,
+    "fps": 30,
+    "pixel_format": "yuv420p"
+  },
+  "sampling": "crop exact native panel; no resizing, superresolution, frame interpolation or geometry changes",
+  "cases": {
+    "main": {
+      "source_frames": 249,
+      "clips": {
+        "A1": {
+          "filename": "main/A1.mp4",
+          "frames": 249,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2499564,
+          "sha256": "1e14bf50660e342746d81b0468724a682366df9bf8267fbabbb283af93f6c41a"
+        },
+        "Scene": {
+          "filename": "main/Scene.mp4",
+          "frames": 249,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2615677,
+          "sha256": "7ad65d8a51b5ed8f2742ea82563096ecf316bab6ab5cf278a0c6c089751f2709"
+        },
+        "A2": {
+          "filename": "main/A2.mp4",
+          "frames": 249,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2615330,
+          "sha256": "57b01ecd5ec7a1a6edbdc9084241b2133be66ed5ff07eb6cd63c8bb1305b3645"
+        },
+        "A3": {
+          "filename": "main/A3.mp4",
+          "frames": 249,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2570799,
+          "sha256": "a45d960e8c537afff07d85267e3b211a9d550770b9c27c8b4a03ea8ccdfbac4c"
+        }
+      }
+    },
+    "cut": {
+      "source_frames": 200,
+      "clips": {
+        "A1": {
+          "filename": "cut/A1.mp4",
+          "frames": 200,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 1707682,
+          "sha256": "6bbc6a653c37614d9a83be6b60d0f780865d0116f4b5395c2666265f53c764d0"
+        },
+        "Scene": {
+          "filename": "cut/Scene.mp4",
+          "frames": 200,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 1840383,
+          "sha256": "dffa9ea70b01c674812089964dd7580022edcca9a6070156839e529557010ee3"
+        },
+        "A2": {
+          "filename": "cut/A2.mp4",
+          "frames": 200,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 1980031,
+          "sha256": "1ef65e654f1372803967d375881d1bdbe0a4e7c4d79e6bedad59b95265dc4a23"
+        },
+        "A3": {
+          "filename": "cut/A3.mp4",
+          "frames": 200,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 1922990,
+          "sha256": "5dea197a559c61ce37f0f307ae329c28a39138fe6e66e47f0a8bc7faf15fb613"
+        }
+      }
+    },
+    "brush": {
+      "source_frames": 209,
+      "clips": {
+        "A1": {
+          "filename": "brush/A1.mp4",
+          "frames": 209,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2264437,
+          "sha256": "dc6c97a75d53b38daba2a94eef525bebf2496773ac11653eddece9161e82a3c9"
+        },
+        "Scene": {
+          "filename": "brush/Scene.mp4",
+          "frames": 209,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2314368,
+          "sha256": "c5ff1d88196f8b64db6fecd11dc663c35be550286bb1de3500c299a77bf6a167"
+        },
+        "A2": {
+          "filename": "brush/A2.mp4",
+          "frames": 209,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2349489,
+          "sha256": "1dd18296198c426f999a72b622f736632e677683a0cddde301a07a1e2d661e0e"
+        },
+        "A3": {
+          "filename": "brush/A3.mp4",
+          "frames": 209,
+          "width": 960,
+          "height": 580,
+          "fps": 30.0,
+          "size_bytes": 2305878,
+          "sha256": "e7de320f8c127b080b8f83e2c6bd957197ca2085c8c606d5af7c694ce50655e2"
+        }
+      }
+    }
+  }
+}

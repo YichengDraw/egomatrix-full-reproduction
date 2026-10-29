@@ -8,3 +8,12 @@
 
 /* Inspect a stage at useful image scale; full composite remains selectable. */
 .recon-window{position:relative;width:100%;aspect-ratio:384/232;overflow:hidden;background:#000}.recon-window video{position:absolute;inset:0 auto 0 0;width:500%;height:100%;max-width:none;object-fit:fill;transform:translateX(-80%)}.recon-window.full-comparison{aspect-ratio:16/9}.recon-window.full-comparison video{width:100%;height:100%;transform:none!important;object-fit:contain}video:fullscreen{width:100%!important;height:100%!important;transform:none!important;object-fit:contain!important}.media-tools:has(#recon-stage){flex-wrap:wrap;padding-block:7px}.media-tools #recon-variant{max-width:250px}.media-tools #recon-stage{max-width:160px}.viewer-section{padding-top:28px}.site-header{padding-top:23px;padding-bottom:18px}
+
+/* True native 960x580 stage clips, not 384x232 crops enlarged 2.5x. Five-column mode remains overview-only. */
+.recon-window:not(.full-comparison){aspect-ratio:960 / 580;min-height:0}
+.recon-window:not(.full-comparison) video{position:absolute;inset:0;width:100%;height:100%;max-width:100%;object-fit:contain;transform:none!important}
+.recon-window.full-comparison video{max-width:100%;transform:none!important}
+
+.hd-stage-download{color:var(--accent);font-size:11px;font-weight:600;white-space:nowrap;text-decoration:none}
+.hd-stage-download:hover{text-decoration:underline}
+.media-tools .hd-stage-download[hidden]{display:none!important}

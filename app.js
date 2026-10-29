@@ -27,10 +27,45 @@ function changePhysicalView(){const hasVideo=variant==='baseline'&&['main','cut'
  $('physics-caption').textContent=hasVideo&&mode==='video'?(task.id==='main'?'来自497控制步真实物理状态的249帧SVOR背景合成；原物体由物理引擎自由运动。':`来自${task.steps}个实际控制步、${task.frames}帧的机器人/双物体物理状态渲染；原RGB画中画对照，未运行SVOR去人，也未重跑仿真。`):`完整${task.steps}控制步的右物体抬高曲线。实线为物理状态，虚线为重建参考；不替代执行渲染视频。`;
  if($('robot-video').hidden)$('robot-video').pause();else if(playing)$('robot-video').play().catch(()=>{});drawPreview();setFrame(frame);}
 
-function setReconStage(){const full=$('recon-stage').value==='all'||$('recon-variant').value!=='stages';$('recon-window').classList.toggle('full-comparison',full);$('recon-video').style.transform=full?'none':`translateX(-${Number($('recon-stage').value)*20}%)`;$('recon-stage').disabled=$('recon-variant').value!=='stages';if(!full){const label=$('recon-stage').selectedOptions[0].textContent;$('recon-caption').textContent=`${label}，与原片逐帧同步；可切换阶段或五列总览。`;}}
+const HD_STAGE_NAMES={'1':'A1','2':'Scene','3':'A2','4':'A3'};
+function reconstructionVideoSource(){
+ if(!task)return '';
+ const mode=$('recon-variant').value,stage=$('recon-stage').value;
+ if(mode==='stages'){
+   if(stage==='all')return 'media/'+task.id+'_reconstruction_stages.mp4';
+   return 'media/hd_stages/'+task.id+'/'+HD_STAGE_NAMES[stage]+'.mp4';
+ }
+ const names={aligned:'main_aligned_teacher_stages.mp4',fixed:'cut_fixed_object_comparison.mp4',mask:'brush_hand_mask_overlay.mp4'};
+ return 'media/'+names[mode];
+}
+function setReconStage(){
+ if(!task)return;
+ const mode=$('recon-variant').value,stage=$('recon-stage').value;
+ const full=stage==='all'||mode!=='stages',v=$('recon-video');
+ $('recon-window').classList.toggle('full-comparison',full);
+ $('recon-stage').disabled=mode!=='stages';
+ v.style.transform='none';
+ const wanted=reconstructionVideoSource();
+ const link=$('recon-hd-download');
+ link.hidden=full;
+ if(!full){link.href=wanted;link.download=task.id+'_'+HD_STAGE_NAMES[stage]+'_native_960x580.mp4';}
+ if(v.getAttribute('src')!==wanted){v.pause();v.src=wanted;v.load();}
+ else if(v.readyState>=1&&Number.isFinite(v.duration)){
+  const next=Math.min(frame/30,Math.max(0,v.duration-1/60));
+  if(Math.abs(v.currentTime-next)>.06)v.currentTime=next;
+ }
+ if(mode==='stages'){
+   $('recon-caption').textContent=full?
+     '五列总览：原RGB / A1 / Scene / A2 / A3。为总览保留缩略视频；单独选阶段可观看原生960×580高清版本。':
+     $('recon-stage').selectedOptions[0].textContent+' · 原始4800×580对照中直接裁取的原生960×580画面；CRF17高清编码、30Hz同步。无超分或重建更改。';
+ }else{
+   const notes={aligned:'Aligned-depth输入修正独立对照；此选项为原多列总览，未替换最终统一控制输入。',fixed:'原A3与固定物体独立对照；本选项为多列比较，保留cut原touch预处理差异。',mask:'原209帧brush的SAM手部掩码叠加，使用同一原片时间。'};
+   $('recon-caption').textContent=notes[mode]||'重建对照视频按原片时间同步。';
+ }
+}
 
 function setTask(id,reset=true){pause();task=DATA.tasks.find(x=>x.id===id);if(!task)throw Error('unknown task');$$('[data-task]').forEach(b=>{const active=b.dataset.task===id;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});$('variant').value=variant;$('timeline').max=String(task.frames-1);$('sample-meta').textContent=`${task.sequence} · ${task.frames}原片帧 / ${task.steps}控制步 · ${task.id==='cut'?'开发验证':'开发'}`;$('source-label').textContent=`TACO · ${task.label}`;$('source-caption').textContent=`${task.frames}/ ${task.frames} 原RGB帧完整保留，30 Hz。原片是公共时间轴。`;
- videos[0].src=`media/${id}_original_rgb.mp4`;videos[1].src=`media/${id}_reconstruction_stages.mp4`;videos[2].src=variant==='baseline'?'media/'+id+'_robot_composite.mp4':'';
+ videos[0].src=`media/${id}_original_rgb.mp4`;videos[1].pause();videos[2].src=variant==='baseline'?'media/'+id+'_robot_composite.mp4':'';
  const opts=[['stages','原最终链 · A1 → Scene → A2 → A3']];if(id==='main')opts.push(['aligned','Aligned-depth 独立完整对照']);if(id==='cut')opts.push(['fixed','A3原链 / 固定物体独立对照']);if(id==='brush')opts.push(['mask','SAM手部掩码叠加']);$('recon-variant').innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');$('recon-stage').value='4';setReconStage();
  const videoOption=$('physical-view').querySelector('option[value=video]');videoOption.disabled=variant!=='baseline';$('physical-view').value=variant==='baseline'?'video':'curve';
  for(const option of $('chart-metric').options)option.disabled=variant==='double'&&option.value.startsWith('GT');if(variant==='double'&&$('chart-metric').value.startsWith('GT'))$('chart-metric').value='height';
@@ -56,7 +91,14 @@ function renderStages(){$('stage-list').innerHTML=stageEntries.map(s=>`<article 
 function renderReports(query=''){const q=query.trim().toLowerCase(),filtered=REPORTS.filter(r=>(r.title+r.stage+r.summary).toLowerCase().includes(q));$('report-list').innerHTML=filtered.length?filtered.map(r=>`<a class="report-link" href="${r.href}"><div><strong>${escapeHtml(r.title)} ↗</strong><small>${escapeHtml(r.stage)}</small></div><p>${escapeHtml(r.summary)}</p></a>`).join(''):'<p class="muted">没有匹配的报告，试试“重建”或“控制”。</p>';}
 function syncTheme(){const dark=document.documentElement.dataset.theme==='dark';$('theme').textContent=dark?'☾':'☀';$('theme').title=$('theme').ariaLabel=dark?'切换到日间模式':'切换到夜间模式';}
 $('theme').addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('egomatrix-theme',t);}catch{}syncTheme();});syncTheme();
-$$('[data-task]').forEach(b=>b.addEventListener('click',()=>setTask(b.dataset.task)));$('variant').addEventListener('change',()=>{variant=$('variant').value;setTask(task.id);});$('recon-variant').addEventListener('change',()=>{const choice=$('recon-variant').value,src=choice==='aligned'?'main_aligned_teacher_stages.mp4':choice==='fixed'?'cut_fixed_object_comparison.mp4':choice==='mask'?'brush_hand_mask_overlay.mp4':`${task.id}_reconstruction_stages.mp4`;$('recon-video').src='media/'+src;setReconStage();$('recon-caption').textContent=choice==='stages'?'各列按原片帧对齐；重建参考与实际执行分列。':choice==='aligned'?'Aligned-depth输入修正独立对照；未替换最终统一控制输入。':choice==='fixed'?'原A3与固定物体独立对照；保留cut原touch预处理差异。':'原209帧brush的SAM手部掩码叠加，使用同一原片时间。';$('recon-video').addEventListener('loadedmetadata',()=>{setFrame(frame);if(playing)$('recon-video').play().catch(()=>{});},{once:true});});$('recon-stage').addEventListener('change',setReconStage);$('physical-view').addEventListener('change',changePhysicalView);$('chart-side').addEventListener('change',drawTrajectory);$('chart-metric').addEventListener('change',drawTrajectory);$('play').addEventListener('click',play);$('restart').addEventListener('click',()=>{pause();setFrame(0);});$('prev').addEventListener('click',()=>{pause();setFrame(frame-1);});$('next').addEventListener('click',()=>{pause();setFrame(frame+1);});$('speed').addEventListener('change',()=>videos.forEach(v=>v.playbackRate=Number($('speed').value)));$('timeline').addEventListener('input',()=>{pause();setFrame(Number($('timeline').value));});$('source-video').addEventListener('loadedmetadata',()=>{setEnabled();setFrame(frame);status(`已就绪：${task.label} · ${variant==='baseline'?'最终统一配置 / 最优900轮':'残差×2独立对照'}。点击同步播放，或逐帧查看。`);});$('source-video').addEventListener('ended',()=>{pause();setFrame(task.frames-1);});videos.forEach(v=>v.addEventListener('error',()=>{if(v.getAttribute('src'))status('有一条视频加载失败；可继续查看已保存的曲线与报告，或刷新后重试。',true);}));
+$$('[data-task]').forEach(b=>b.addEventListener('click',()=>setTask(b.dataset.task)));$('variant').addEventListener('change',()=>{variant=$('variant').value;setTask(task.id);});$('recon-variant').addEventListener('change',setReconStage);
+$('recon-video').addEventListener('loadedmetadata',()=>{
+ if(!task)return;
+ const v=$('recon-video'),target=Math.min(frame/30,Math.max(0,v.duration-1/60));
+ if(Number.isFinite(target))v.currentTime=target;
+ if(playing)v.play().catch(()=>{});
+});
+$('recon-stage').addEventListener('change',setReconStage);$('physical-view').addEventListener('change',changePhysicalView);$('chart-side').addEventListener('change',drawTrajectory);$('chart-metric').addEventListener('change',drawTrajectory);$('play').addEventListener('click',play);$('restart').addEventListener('click',()=>{pause();setFrame(0);});$('prev').addEventListener('click',()=>{pause();setFrame(frame-1);});$('next').addEventListener('click',()=>{pause();setFrame(frame+1);});$('speed').addEventListener('change',()=>videos.forEach(v=>v.playbackRate=Number($('speed').value)));$('timeline').addEventListener('input',()=>{pause();setFrame(Number($('timeline').value));});$('source-video').addEventListener('loadedmetadata',()=>{setEnabled();setFrame(frame);status(`已就绪：${task.label} · ${variant==='baseline'?'最终统一配置 / 最优900轮':'残差×2独立对照'}。点击同步播放，或逐帧查看。`);});$('source-video').addEventListener('ended',()=>{pause();setFrame(task.frames-1);});videos.forEach(v=>v.addEventListener('error',()=>{if(v.getAttribute('src'))status('有一条视频加载失败；可继续查看已保存的曲线与报告，或刷新后重试。',true);}));
 $$('[data-fullscreen]').forEach(b=>b.addEventListener('click',()=>{const v=$(b.dataset.fullscreen);if(v.requestFullscreen)v.requestFullscreen().catch(()=>{});}));
 ['trajectory-chart','preview-chart'].forEach(id=>$(id).addEventListener('pointerdown',e=>{const model=chartModels.get(id);if(!model)return;const rect=$(id).getBoundingClientRect(),pos=(e.clientX-rect.left)/rect.width*model.W;pause();setFrame((pos-model.left)/(model.W-model.left-model.right)*(task.frames-1));}));
 $('show-brush-control').addEventListener('click',()=>{variant='double';setTask('brush');$('viewer').scrollIntoView({behavior:'smooth'});});$('report-search').addEventListener('input',e=>renderReports(e.target.value));

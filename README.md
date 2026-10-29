@@ -29,3 +29,11 @@ Original paper: https://arxiv.org/html/2610.18822v1 — named authors' project h
 Deployment: GitHub Pages, branch `main`, directory `/`. A `.nojekyll` file preserves binary and other assets.
 
 Updated 2026-10-28.
+
+## Native-quality reconstruction stages (2026-10-29)
+
+The original five-column source videos are 4800×580, each stage 960×580. Earlier web exports downscaled the entire montage to 1920×232 (only 384×232 per stage), then enlarged each selected stage, making it noticeably blurry.
+
+The site now **loads a separate original-resolution 960×580 video** when you select A1, Scene, A2 or A3 for Stir, Cut or Brush. The complete five-column overview is preserved as the lightweight historical overview. Each selected stage has a direct MP4 download link. The 12 videos are 30 fps with full native frame coverage and H.264 CRF17 encoding. No super-resolution, frame interpolation, GT feedback or reconstruction change was introduced.
+
+Evidence and exact source-panel mapping: [HD video manifest](media/hd_stages/manifest.json).
